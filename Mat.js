@@ -81,14 +81,6 @@ const Mat = {
     }
     return result;
   },
-  /**
-   * 
-   * @param {*} mat1 
-   * @param {*} mat2 
-   * @param {*} rowIndex 
-   * @param {*} colIndex 
-   * @returns 
-   */
   dot(mat1, mat2, rowIndex = 0, colIndex = 0) {
     let result = 0;
     if (mat1[0].length != mat2.length) return result;
