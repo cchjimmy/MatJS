@@ -27,6 +27,10 @@ import Mat from './Mat.js';
         vel: Mat.matrix((Math.random() - 0.5) * maxSpeed, (Math.random() - 0.5) * maxSpeed)
       })
     }
+    
+    let a = Mat.matrix([1,2,3],[4,5,6],[7,8,9]);
+    
+    console.log(a, '\n', Mat.gaussElimination(a));
 
     update();
   }
