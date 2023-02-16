@@ -28,11 +28,24 @@ import Mat from './Mat.js';
       })
     }
     
-    let a = Mat.matrix([1,2,3],[4,5,6],[7,8,9]);
+    let a = Mat.random(10, 10);
+    let o, g, ot, gt;
+    ot=measureFunc(()=>o=Mat.det(a, 'old'));
+    gt=measureFunc(()=>g=Mat.det(a));
+    let txt = `Mat.det() performance test\n\ninput matrix:\n${Mat.print(a)}\n\ntime taken:\nold: ${ot} ms\ngause: ${gt}ms\n\ndeterminant from old method: ${o}\ndeterminant incorporating gauss elimination: ${g}\n\ndifference: ${Math.abs(o-g)}`;
     
-    console.log(a, '\n', Mat.gaussElimination(a));
-
+    let p = document.createElement('p');
+    p.innerText = txt;
+    p.style.color = 'white';
+    document.body.appendChild(p);
+    
     update();
+  }
+  
+  function measureFunc(func) {
+    let past = performance.now();
+    func();
+    return performance.now() - past;
   }
 
   function update() {

@@ -17,7 +17,7 @@ const Mat = {
     }
     return matrix;
   },
-  zeros(n, m) {
+  zeros(m, n) {
     let matrix = [];
     for (let j = 0; j < m; j++) {
       matrix.push([]);
@@ -110,36 +110,45 @@ const Mat = {
     }
     return matrix;
   },
-  det(mat) {
+  det(mat, method = 'gauss') {
     let d = 0;
     
     // if mat is not a square matrix, return
     if (mat.length !== mat[0].length) return;
     
-    // if mat is a order 2 square matrix, calculate the determinant
-    if (mat.length == 2) return mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0];
+    if (method == 'old') {
+      // if mat is a order 2 square matrix, calculate the determinant
+      if (mat.length == 2) return mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0];
     
-    let c = Mat.copy(mat);
-    // remove first row
-    c.splice(0, 1);
-    for (let i = 0; i < mat[0].length; i++) {
-      let values = [];
-      let e = Mat.transpose(c);
-      // remove row of transpose matrix corresponding to index i
-      e.splice(i, 1);
-      // transpose back to original orientation
-      e = Mat.transpose(e);
-      d += (i % 2 ? -1 : 1) * mat[0][i] * Mat.det(e);
+      let c = Mat.copy(mat);
+      // remove first row
+      c.splice(0, 1);
+      for (let i = 0; i < mat[0].length; i++) {
+        let e = Mat.copy(c);
+        for (let j = 0; j < e.length; j++) {
+          e[j].splice(i, 1);
+        }
+        d += (i % 2 ? -1 : 1) * mat[0][i] * Mat.det(Mat.transpose(e), method);
+      }
+    } else if (method == 'gauss') {
+      let r = Mat.gauss(mat, true);
+      let m = r[0];
+      d = m[m.length - 2][m.length - 2] * m[m.length - 1][m.length - 1] - m[m.length - 2][m.length - 1] * m[m.length - 1][m.length - 2];
+      for (let i = 0; i < m.length - 2; i++) {
+        d *= m[i][i];
+      }
+      r[1] % 2 ? d *= -1 : d *= 1;
     }
     return d;
   },
-  gaussElimination(mat) {
+  gauss(mat, swapCount = false) {
     // credit: https://en.m.wikipedia.org/wiki/Gaussian_elimination
     let c = Mat.copy(mat);
     let h = 0;
     let k = 0;
     let m = c.length; // number of rows
     let n = c[0].length; // number of columns
+    let s = 0; // row swap count
     while (h < m && k < n) {
       let maxEntry = 0;
       let i_max = 0;
@@ -150,26 +159,41 @@ const Mat = {
         i_max = i;
       }
       if (c[i_max][k] == 0) {
-        k += 1;
+        k++;
       } else {
-        c[h] = c.splice(i_max, 1, c[h])[0];
+        if (h != i_max) {
+          c[h] = c.splice(i_max, 1, c[h])[0];
+          s++;
+        }
         for (let i = h + 1; i < m; i++) {
-          let f = c[i][k] / c[h][k] || 0;
+          let f = c[i][k] / c[h][k];
           c[i][k] = 0;
           for (let j = k + 1; j < n; j++) {
             c[i][j] -= c[h][j] * f;
           }
         }
-        h += 1;
-        k += 1;
+        h++;
+        k++;
       }
     }
-    return c;
+    return swapCount ? [c, s] : c;
+  },
+  random(m, n) {
+    let matrix = [];
+    for (let i = 0; i < m; i++) {
+      matrix.push([]);
+      for (let j = 0; j < n; j++) {
+        matrix[i].push(Math.random());
+      }
+    }
+    return matrix;
   },
   print(mat) {
+    let message = `rows: ${mat.length}, columns: ${mat[0].length}\n`;
     for (let i = 0; i < mat.length; i++) {
-      console.log(mat[i], '\n');
+      message += `${mat[i]}\n`;
     }
+    return message;
   }
 }
 
