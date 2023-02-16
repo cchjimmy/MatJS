@@ -27,27 +27,22 @@ import Mat from './Mat.js';
         vel: Mat.matrix((Math.random() - 0.5) * maxSpeed, (Math.random() - 0.5) * maxSpeed)
       })
     }
-    
-    let a = Mat.random(10, 10);
-    let o, g, ot, gt;
-    ot=measureFunc(()=>o=Mat.det(a, 'old'));
-    gt=measureFunc(()=>g=Mat.det(a));
-    let txt = `Mat.det() performance test\n\ninput matrix:\n${Mat.print(a)}\n\ntime taken:\nold: ${ot} ms\ngauss: ${gt} ms\n\ndeterminant from old method: ${o}\ndeterminant incorporating gauss elimination: ${g}\n\ndifference: ${Math.abs(o-g)}`;
-    
-    let p = document.createElement('p');
-    p.innerText = txt;
-    p.style.color = 'white';
-    document.body.appendChild(p);
-    
-    a = Mat.matrix([1,2,3],[4,5,6],[7,8,9]);
-    let b = Mat.identity(3);
-    
-    let t = measureFunc(()=>a = Mat.multM(a, b));
-    
-    console.log(`${t} ms`);
+
+
+    let a, o, g, ot, gt;
+    a = Mat.random(10, 10);
+    ot = measureFunc(() => o = Mat.det(a, 'old'));
+    gt = measureFunc(() => g = Mat.det(a));
+    let txt = `<h2>Mat.det() performance test</h2>Input matrix:<pre><code>${Mat.print(a)}</code></pre>Time taken:<br>old: ${ot} ms<br>gauss: ${gt} ms<br><br>Determinants:<br>From old method: ${o}<br>Incorporating gauss elimination: ${g}<br><br>Percentage difference (old - gauss): ${(o - g) * 100} %`;
+
+    let div = document.createElement('div');
+    div.innerHTML = txt;
+    div.style.color = 'white';
+    document.body.appendChild(div);
+
     update();
   }
-  
+
   function measureFunc(func) {
     let past = performance.now();
     func();
