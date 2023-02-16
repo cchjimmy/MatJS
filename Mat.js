@@ -1,17 +1,19 @@
 const Mat = {
+  shape(mat) {
+    let rows = mat.length;
+    let columns = 0;
+    for (let i = 0; i < rows; i++) {
+      columns = columns >= mat[i].length ? columns : mat[i].length;
+    }
+    return [rows, columns];
+  },
   matrix(...values) {
-    let columns = Math.max(...(() => {
-      let l = [];
-      for (let i = 0; i < values.length; i++) {
-        l.push(values[i].length || 1);
-      }
-      return l;
-    })());
+    let shape = Mat.shape(values);
     let matrix = [];
-    for (let j = 0; j < values.length; j++) {
+    for (let j = 0; j < shape[0]; j++) {
       matrix.push(values[j].length ? [...values[j]] : [values[j]]);
       let l = values[j].length || 1;
-      for (let i = 0; i < columns - l; i++) {
+      for (let i = 0; i < shape[1] - l; i++) {
         matrix[j].push(0);
       }
     }
@@ -28,26 +30,31 @@ const Mat = {
     return matrix;
   },
   add(mat1, mat2) {
-    if (mat1[0].length != mat2[0].length || mat1.length != mat2.length) return;
-    for (let j = 0; j < mat1.length; j++) {
-      for (let i = 0; i < mat1[0].length; i++) {
+    let shape1 = Mat.shape(mat1);
+    let shape2 = Mat.shape(mat2);
+    if (JSON.stringify(shape1) != JSON.stringify(shape2)) return;
+    for (let j = 0; j < shape1[0]; j++) {
+      for (let i = 0; i < shape1[1]; i++) {
         mat1[j][i] += mat2[j][i];
       }
     }
     return mat1;
   },
   subtract(mat1, mat2) {
-    if (mat1[0].length != mat2[0].length || mat1.length != mat2.length) return;
-    for (let j = 0; j < mat1.length; j++) {
-      for (let i = 0; i < mat1[0].length; i++) {
+    let shape1 = Mat.shape(mat1);
+    let shape2 = Mat.shape(mat2);
+    if (JSON.stringify(shape1) != JSON.stringify(shape2)) return;
+    for (let j = 0; j < shape1[0]; j++) {
+      for (let i = 0; i < shape1[1]; i++) {
         mat1[j][i] -= mat2[j][i];
       }
     }
     return mat1;
   },
   multS(mat, scalar) {
-    for (let j = 0; j < mat.length; j++) {
-      for (let i = 0; i < mat[0].length; i++) {
+    let shape = Mat.shape(mat);
+    for (let j = 0; j < shape[0]; j++) {
+      for (let i = 0; i < shape[1]; i++) {
         mat[j][i] *= scalar;
       }
     }
@@ -55,37 +62,38 @@ const Mat = {
   },
   transpose(mat) {
     let result = [];
-    for (let j = 0; j < mat[0].length; j++) {
+    let shape = Mat.shape(mat);
+    for (let j = 0; j < shape[1]; j++) {
       result.push([]);
-      for (let i = 0; i < mat.length; i++) {
+      for (let i = 0; i < shape[0]; i++) {
         result[j].push(mat[i][j]);
       }
     }
     return result;
   },
   copy(source) {
-    let matrix = [];
-    for (let j = 0; j < source.length; j++) {
-      matrix.push([...source[j]]);
-    }
-    return matrix;
+    return Mat.matrix(...source);
   },
   multM(mat1, mat2) {
-    if (mat1[0].length != mat2.length) return;
-    let result = [];
-    for (let i = 0; i < mat1.length; i++) {
+    let shape1 = Mat.shape(mat1);
+    let shape2 = Mat.shape(mat2);
+    if (shape1[1] != shape2[0]) return;
+    let result = []
+    for (let i = 0; i < shape1[1]; i++) {
       result.push([]);
-      for (let j = 0; j < mat2[0].length; j++) {
+      for (let j = 0; j < shape2[0]; j++) {
         result[i].push(Mat.dot(mat1, mat2, i, j));
       }
     }
     return result;
   },
   dot(mat1, mat2, rowIndex = 0, colIndex = 0) {
-    if (mat1[0].length != mat2.length) return;
+    let shape1 = Mat.shape(mat1);
+    let shape2 = Mat.shape(mat2);
+    if (shape1[1] != shape2[0]) return;
     let result = 0;
     mat2 = Mat.transpose(mat2);
-    for (let i = 0; i < mat1[0].length; i++) {
+    for (let i = 0; i < shape1[1]; i++) {
       result += mat1[rowIndex][i] * mat2[colIndex][i];
     }
     return result;
@@ -111,19 +119,19 @@ const Mat = {
     return matrix;
   },
   det(mat, method = 'gauss') {
-    let d = 0;
-    
+    let shape = Mat.shape(mat);
     // if mat is not a square matrix, return
-    if (mat.length !== mat[0].length) return;
+    if (shape[0] !== shape[1]) return;
     
+    let d = 0;
     if (method == 'old') {
       // if mat is a order 2 square matrix, calculate the determinant
-      if (mat.length == 2) return mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0];
+      if (shape[0] == 2) return mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0];
     
       let c = Mat.copy(mat);
       // remove first row
       c.splice(0, 1);
-      for (let i = 0; i < mat[0].length; i++) {
+      for (let i = 0; i < shape[0]; i++) {
         let e = Mat.copy(c);
         for (let j = 0; j < e.length; j++) {
           e[j].splice(i, 1);
@@ -144,10 +152,11 @@ const Mat = {
   gauss(mat, swapCount = false) {
     // credit: https://en.m.wikipedia.org/wiki/Gaussian_elimination
     let c = Mat.copy(mat);
+    let shape = Mat.shape(c);
     let h = 0;
     let k = 0;
-    let m = c.length; // number of rows
-    let n = c[0].length; // number of columns
+    let m = shape[0]; // number of rows
+    let n = shape[1]; // number of columns
     let s = 0; // row swap count
     while (h < m && k < n) {
       let maxEntry = 0;
@@ -189,8 +198,9 @@ const Mat = {
     return matrix;
   },
   print(mat) {
-    let message = `rows: ${mat.length}, columns: ${mat[0].length}\n`;
-    for (let i = 0; i < mat.length; i++) {
+    let shape = Mat.shape(mat);
+    let message = `rows: ${shape[0]}, columns: ${shape[1]}\n`;
+    for (let i = 0; i < shape[0]; i++) {
       message += `${mat[i]}\n`;
     }
     return message;

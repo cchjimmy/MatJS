@@ -32,13 +32,19 @@ import Mat from './Mat.js';
     let o, g, ot, gt;
     ot=measureFunc(()=>o=Mat.det(a, 'old'));
     gt=measureFunc(()=>g=Mat.det(a));
-    let txt = `Mat.det() performance test\n\ninput matrix:\n${Mat.print(a)}\n\ntime taken:\nold: ${ot} ms\ngauss: ${gt}ms\n\ndeterminant from old method: ${o}\ndeterminant incorporating gauss elimination: ${g}\n\ndifference: ${Math.abs(o-g)}`;
+    let txt = `Mat.det() performance test\n\ninput matrix:\n${Mat.print(a)}\n\ntime taken:\nold: ${ot} ms\ngauss: ${gt} ms\n\ndeterminant from old method: ${o}\ndeterminant incorporating gauss elimination: ${g}\n\ndifference: ${Math.abs(o-g)}`;
     
     let p = document.createElement('p');
     p.innerText = txt;
     p.style.color = 'white';
     document.body.appendChild(p);
     
+    a = Mat.matrix([1,2,3],[4,5,6],[7,8,9]);
+    let b = Mat.identity(3);
+    
+    let t = measureFunc(()=>a = Mat.multM(a, b));
+    
+    console.log(`${t} ms`);
     update();
   }
   
