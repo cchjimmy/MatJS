@@ -32,7 +32,7 @@ import Mat from './Mat.js';
     let o, g, ot, gt;
     ot=measureFunc(()=>o=Mat.det(a, 'old'));
     gt=measureFunc(()=>g=Mat.det(a));
-    let txt = `Mat.det() performance test\n\ninput matrix:\n${Mat.print(a)}\n\ntime taken:\nold: ${ot} ms\ngause: ${gt}ms\n\ndeterminant from old method: ${o}\ndeterminant incorporating gauss elimination: ${g}\n\ndifference: ${Math.abs(o-g)}`;
+    let txt = `Mat.det() performance test\n\ninput matrix:\n${Mat.print(a)}\n\ntime taken:\nold: ${ot} ms\ngauss: ${gt}ms\n\ndeterminant from old method: ${o}\ndeterminant incorporating gauss elimination: ${g}\n\ndifference: ${Math.abs(o-g)}`;
     
     let p = document.createElement('p');
     p.innerText = txt;
