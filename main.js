@@ -30,7 +30,7 @@ import Mat from './Mat.js';
 
 
     let a, o, g, ot, gt;
-    a = Mat.random(10, 10);
+    a = Mat.random(6, 6);
     ot = measureFunc(() => o = Mat.det(a, 'old'));
     gt = measureFunc(() => g = Mat.det(a));
     let txt = `<h2>Mat.det() performance test</h2>Input matrix:<pre><code>${Mat.string(a)}</code></pre>Time taken:<br>old: ${ot} ms<br>gauss: ${gt} ms<br><br>Determinants:<br>From old method: ${o}<br>Incorporating gauss elimination: ${g}<br><br>Percentage difference (old - gauss): ${(o - g) * 100} %`;
@@ -39,6 +39,9 @@ import Mat from './Mat.js';
     div.innerHTML = txt;
     div.style.color = 'white';
     document.body.appendChild(div);
+    
+    console.log(measureFunc(()=>Mat.copy(a)));
+    console.log(measureFunc(()=>Mat.matrix(...a)))
 
     update();
   }

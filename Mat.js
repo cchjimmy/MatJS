@@ -64,9 +64,7 @@ const Mat = {
   add(mat1, mat2) {
     let shape1 = Mat.shape(mat1);
     let shape2 = Mat.shape(mat2);
-    for (let i = 0; i < shape1.length; i++) {
-      if (shape1[i] != shape2[i]) return;
-    }
+    if (shape1[0] != shape2[0] || shape1[1] != shape2[1]) return;
     for (let i = 0; i < shape1[0]; i++) {
       for (let j = 0; j < shape1[1]; j++) {
         mat1[i][j] += mat2[i][j];
@@ -83,9 +81,7 @@ const Mat = {
   subtract(mat1, mat2) {
     let shape1 = Mat.shape(mat1);
     let shape2 = Mat.shape(mat2);
-    for (let i = 0; i < shape1.length; i++) {
-      if (shape1[i] != shape2[i]) return;
-    }
+    if (shape1[0] != shape2[0] || shape1[1] != shape2[1]) return;
     for (let i = 0; i < shape1[0]; i++) {
       for (let j = 0; j < shape1[1]; j++) {
         mat1[i][j] -= mat2[i][j];
@@ -156,10 +152,10 @@ const Mat = {
   },
   /**
    * Multiplies a specified column in mat2 into a specified row in mat1.
-   * @param {*} mat1 
-   * @param {*} mat2 
-   * @param {*} rowIndex Row index for mat1
-   * @param {*} colIndex Column index for mat2
+   * @param {number[][]} mat1 
+   * @param {number[][]} mat2 
+   * @param {number} rowIndex Row index for mat1
+   * @param {number} colIndex Column index for mat2
    * @returns {number} The result of the dot product.
    */
   dot(mat1, mat2, rowIndex = 0, colIndex = 0) {
@@ -326,7 +322,7 @@ const Mat = {
    * Creates a new empty matrix with shape m * n.
    * @param {number} m Number of rows.
    * @param {number} n Number of columns.
-   * @return {any[][]} An empty matrix.
+   * @return {any[][]} The empty matrix.
    */
   empty(m,n) {
     let matrix = new Array(m);
