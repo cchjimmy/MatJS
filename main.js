@@ -33,7 +33,7 @@ import Mat from './Mat.js';
     a = Mat.random(10, 10);
     ot = measureFunc(() => o = Mat.det(a, 'old'));
     gt = measureFunc(() => g = Mat.det(a));
-    let txt = `<h2>Mat.det() performance test</h2>Input matrix:<pre><code>${Mat.print(a)}</code></pre>Time taken:<br>old: ${ot} ms<br>gauss: ${gt} ms<br><br>Determinants:<br>From old method: ${o}<br>Incorporating gauss elimination: ${g}<br><br>Percentage difference (old - gauss): ${(o - g) * 100} %`;
+    let txt = `<h2>Mat.det() performance test</h2>Input matrix:<pre><code>${Mat.string(a)}</code></pre>Time taken:<br>old: ${ot} ms<br>gauss: ${gt} ms<br><br>Determinants:<br>From old method: ${o}<br>Incorporating gauss elimination: ${g}<br><br>Percentage difference (old - gauss): ${(o - g) * 100} %`;
 
     let div = document.createElement('div');
     div.innerHTML = txt;

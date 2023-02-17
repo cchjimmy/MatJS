@@ -26,16 +26,13 @@ const Mat = {
     let shape = Mat.shape(values);
 
     // initialize matrix
-    let matrix = new Array(shape[0]);
-    for (let i = 0; i < shape[0]; i++) {
-      matrix[i] = new Array(shape[1]);
-    }
+    let matrix = Mat.empty(shape[0], shape[1]);
 
     // input values into matrix
-    for (let i = 0; i < shape[0] * shape[1]; i++) {
-      let x = i % shape[1];
-      let y = (i - x) / shape[1];
-      matrix[y][x] = values[y][x] || 0;
+    for (let i = 0; i < shape[0]; i++) {
+      for (let j = 0; j < shape[1]; j++) {
+        matrix[i][j] = values[i][j] || 0;
+      }
     }
 
     return matrix;
@@ -70,13 +67,10 @@ const Mat = {
     for (let i = 0; i < shape1.length; i++) {
       if (shape1[i] != shape2[i]) return;
     }
-    for (let i = 0; i < shape1[0] * shape1[1]; i++) {
-      // we know index = x + y * width and x = index % width
-      // so y = (index - x) / width
-
-      let x = i % shape1[1];
-      let y = (i - x) / shape1[1];
-      mat1[y][x] += mat2[y][x];
+    for (let i = 0; i < shape1[0]; i++) {
+      for (let j = 0; j < shape1[1]; j++) {
+        mat1[i][j] += mat2[i][j];
+      }
     }
     return mat1;
   },
@@ -92,10 +86,10 @@ const Mat = {
     for (let i = 0; i < shape1.length; i++) {
       if (shape1[i] != shape2[i]) return;
     }
-    for (let i = 0; i < shape1[0] * shape1[1]; i++) {
-      let x = i % shape1[1];
-      let y = (i - x) / shape1[1];
-      mat1[y][x] -= mat2[y][x];
+    for (let i = 0; i < shape1[0]; i++) {
+      for (let j = 0; j < shape1[1]; j++) {
+        mat1[i][j] -= mat2[i][j];
+      }
     }
     return mat1;
   },
@@ -107,10 +101,10 @@ const Mat = {
    */
   multS(mat, scalar) {
     let shape = Mat.shape(mat);
-    for (let i = 0; i < shape[0] * shape[1]; i++) {
-      let x = i % shape[1];
-      let y = (i - x) / shape[1];
-      mat[y][x] *= scalar;
+    for (let i = 0; i < shape[0]; i++) {
+      for (let j = 0; j < shape[1]; j++) {
+        mat[i][j] *= scalar;
+      }
     }
     return mat;
   },
@@ -121,14 +115,11 @@ const Mat = {
    */
   transpose(mat) {
     let shape = Mat.shape(mat);
-    let result = new Array(shape[1]);
-    for (let i = 0; i < shape[1]; i++) {
-      result[i] = new Array(shape[0]);
-    }
-    for (let i = 0; i < shape[0] * shape[1]; i++) {
-      let x = i % shape[1];
-      let y = (i - x) / shape[1];
-      result[x][y] = mat[y][x];
+    let result = Mat.empty(shape[1], shape[0]);
+    for (let i = 0; i < shape[0]; i++) {
+      for (let j = 0; j < shape[1]; j++) {
+        result[j][i] = mat[i][j];
+      }
     }
     return result;
   },
@@ -138,7 +129,12 @@ const Mat = {
    * @returns {number[][]} A new matrix with entries the same as the source matrix.
    */
   copy(source) {
-    return Mat.matrix(...source);
+    let shape = Mat.shape(source);
+    let matrix = new Array(shape[0]);
+    for (let i = 0; i < shape[0]; i++) {
+      matrix[i] = source[i].slice(0);
+    }
+    return matrix;
   },
   /**
    * Matrix multiplication, the number of columns in mat1 must be the same as the number of rows in mat2.
@@ -150,14 +146,11 @@ const Mat = {
     let shape1 = Mat.shape(mat1);
     let shape2 = Mat.shape(mat2);
     if (shape1[1] != shape2[0]) return;
-    let result = new Array(shape1[0]);
-    for (let i = 0; i < shape1[0]; i++) {
-      result[i] = new Array(shape2[1]);
-    }
-    for (let i = 0; i < shape1[0] * shape2[1]; i++) {
-      let x = i % shape2[1];
-      let y = (i - x) / shape2[1];
-      result[y][x] = Mat.dot(mat1, mat2, y, x);
+    let result = Mat.empty(shape2[0], shape1[1]);
+    for (let i = 0; i < shape2[0]; i++) {
+      for (let j = 0; j < shape1[1]; j++) {
+        result[i][j] = Mat.dot(mat1, mat2, i, j);
+      }
     }
     return result;
   },
@@ -199,11 +192,14 @@ const Mat = {
    */
   signs(order) {
     let matrix = new Array(order);
+    let r0 = new Array(order);
     for (let i = 0; i < order; i++) {
-      matrix[i] = new Array(order);
-      for (let j = 0; j < order; j++) {
-        matrix[i][j] = (j + i) % 2 ? -1 : 1;
-      }
+      r0[i] = i % 2 ? -1 : 1;
+    }
+    let r1 = r0.slice(1);
+    r1.push((r0.length - 1) % 2 ? 1 : -1);
+    for (let i = 0; i < order; i++) {
+      matrix[i] = i % 2 ? r1 : r0;
     }
     return matrix;
   },
@@ -295,40 +291,50 @@ const Mat = {
    * @returns {number[][]} The random matrix.
    */
   random(m, n) {
-    let matrix = new Array(m);
+    let matrix = Mat.empty(m, n);
     for (let i = 0; i < m; i++) {
-      matrix[i] = new Array(n);
-    }
-    for (let i = 0; i < m * n; i++) {
-      let x = i % n;
-      let y = (i - x) / n;
-      matrix[y][x] = Math.random();
+      for (let j = 0; j < n; j++) {
+        matrix[i][j] = Math.random();
+      }
     }
     return matrix;
   },
   /**
-   * 
+   * Creates a string representation of the matrix with shape information.
    * @param {number[][]} mat 
-   * @returns 
+   * @returns {string} The string representing the input matrix.
    */
-  print(mat) {
+  string(mat) {
     let shape = Mat.shape(mat);
-    let message = `rows: ${shape[0]}, columns: ${shape[1]}\n`;
+    let s = `rows: ${shape[0]}, columns: ${shape[1]}\n`;
     for (let i = 0; i < shape[0]; i++) {
       for (let j = 0; j < shape[1]; j++) {
-        message += ` -------`;
+        s += ` -------`;
       }
-      message += '\n';
-      message += '|'
+      s += '\n|';
       for (let j = 0; j < shape[1]; j++) {
-        message += ` ${mat[i][j].toFixed(3)} |`;
+        s += ` ${mat[i][j].toFixed(3)} |`;
       }
-      message += '\n';
+      s += '\n';
     }
     for (let j = 0; j < shape[1]; j++) {
-      message += ` -------`;
+      s += ` -------`;
     }
-    return message;
+    return s;
+  },
+  /**
+   * Creates a new empty matrix with shape m * n.
+   * @param {number} m Number of rows.
+   * @param {number} n Number of columns.
+   * @return {any[][]} An empty matrix.
+   */
+  empty(m,n) {
+    let matrix = new Array(m);
+    let row = new Array(n);
+    for (let i = 0; i < m; i++) {
+      matrix[i] = row.slice(0);
+    }
+    return matrix;
   }
 }
 
