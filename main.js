@@ -39,9 +39,9 @@ import Mat from './Mat.js';
     div.innerHTML = txt;
     div.style.color = 'white';
     document.body.appendChild(div);
-    
-    console.log(measureFunc(()=>Mat.copy(a)));
-    console.log(measureFunc(()=>Mat.matrix(...a)))
+
+    console.log(measureFunc(() => Mat.copy(a)));
+    console.log(measureFunc(() => Mat.matrix(...a)))
 
     update();
   }
@@ -61,16 +61,13 @@ import Mat from './Mat.js';
       if (p[0][0] < 0) {
         reflect(v, normals.left);
         p[0][0] = 1;
-      }
-      if (p[0][0] > canvas.width) {
+      } else if (p[0][0] > canvas.width) {
         reflect(v, normals.right);
         p[0][0] = canvas.width - 1;
-      }
-      if (p[1][0] < 0) {
+      } else if (p[1][0] < 0) {
         reflect(v, normals.bottom);
         p[1][0] = 1;
-      }
-      if (p[1][0] > canvas.height) {
+      } else if (p[1][0] > canvas.height) {
         reflect(v, normals.top);
         p[1][0] = canvas.height - 1;
       }
@@ -84,9 +81,18 @@ import Mat from './Mat.js';
 
     // draw objects
     ctx.strokeStyle = 'blue';
+    ctx.beginPath();
     for (let i = 0; i < numberOfObjects; i++) {
-      ctx.strokeRect(objects[i].pos[0][0] - 5, objects[i].pos[1][0] - 5, 10, 10);
+      let x = objects[i].pos[0][0];
+      let y = objects[i].pos[1][0];
+
+      ctx.moveTo(x - 5, y - 5);
+      ctx.lineTo(x + 5, y - 5);
+      ctx.lineTo(x + 5, y + 5);
+      ctx.lineTo(x - 5, y + 5);
+      ctx.lineTo(x - 5, y - 5);
     }
+    ctx.stroke();
 
     let now = performance.now();
     dt = (now - last) * 0.001;
