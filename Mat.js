@@ -38,17 +38,17 @@ const Mat = {
     return matrix;
   },
   /**
-   * Creates a zero matrix.
+   * Creates a matrix with every entry equals to the specified value.
    * @param {number} m Number of rows.
    * @param {number} n Number of columns.
-   * @returns {number[][]} A matrix of 0s with specified shape.
+   * @returns {number[][]} A matrix with specified shape and value.
    */
-  zeros(m, n) {
+  fill(m, n, value) {
     // credit: https://stackoverflow.com/questions/34773846/javascript-faster-way-to-create-and-initialize-two-dimensional-array-matrix
     let matrix = new Array(m);
     let row = new Array(n);
     for (let i = 0; i < n; i++) {
-      row[i] = 0;
+      row[i] = value;
     }
     for (let i = 0; i < m; i++) {
       matrix[i] = row.slice(0);
@@ -121,9 +121,8 @@ const Mat = {
    * @returns {number[][]} A new matrix with entries the same as the source matrix.
    */
   copy(source) {
-    let shape = Mat.shape(source);
-    let matrix = new Array(shape[0]);
-    for (let i = 0; i < shape[0]; i++) {
+    let matrix = new Array(source.length);
+    for (let i = 0; i < source.length; i++) {
       matrix[i] = source[i].slice(0);
     }
     return matrix;
@@ -165,7 +164,7 @@ const Mat = {
    * @returns {number[][]} An identity matrix.
    */
   identity(order) {
-    let matrix = Mat.zeros(order, order);
+    let matrix = Mat.fill(order, order, 0);
     for (let i = 0; i < order; i++) {
       matrix[i][i] = 1;
     }
