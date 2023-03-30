@@ -63,8 +63,6 @@ const Mat = {
    */
   add(mat1, mat2) {
     let shape1 = Mat.shape(mat1);
-    let shape2 = Mat.shape(mat2);
-    if (shape1[0] != shape2[0] || shape1[1] != shape2[1]) return;
     for (let i = 0; i < shape1[0]; i++) {
       for (let j = 0; j < shape1[1]; j++) {
         mat1[i][j] += mat2[i][j];
@@ -80,8 +78,6 @@ const Mat = {
    */
   subtract(mat1, mat2) {
     let shape1 = Mat.shape(mat1);
-    let shape2 = Mat.shape(mat2);
-    if (shape1[0] != shape2[0] || shape1[1] != shape2[1]) return;
     for (let i = 0; i < shape1[0]; i++) {
       for (let j = 0; j < shape1[1]; j++) {
         mat1[i][j] -= mat2[i][j];
@@ -141,31 +137,25 @@ const Mat = {
   multM(mat1, mat2) {
     let shape1 = Mat.shape(mat1);
     let shape2 = Mat.shape(mat2);
-    if (shape1[1] != shape2[0]) return;
-    let result = Mat.empty(shape2[0], shape1[1]);
-    for (let i = 0; i < shape2[0]; i++) {
-      for (let j = 0; j < shape1[1]; j++) {
-        result[i][j] = Mat.dot(mat1, mat2, i, j);
+    let result = Mat.empty(shape1[0], shape2[1]);
+    mat2 = Mat.transpose(mat2);
+    for (let i = 0; i < shape1[0]; i++) {
+      for (let j = 0; j < shape2[1]; j++) {
+        result[i][j] = Mat.dot(mat1[i], mat2[j]);
       }
     }
     return result;
   },
   /**
-   * Multiplies a specified column in mat2 into a specified row in mat1.
-   * @param {number[][]} mat1 
-   * @param {number[][]} mat2 
-   * @param {number} rowIndex Row index for mat1
-   * @param {number} colIndex Column index for mat2
+   * dot product between 2 nth length vectors, v1 and v2
+   * @param {number[]} v1
+   * @param {number[]} v2
    * @returns {number} The result of the dot product.
    */
-  dot(mat1, mat2, rowIndex = 0, colIndex = 0) {
-    let shape1 = Mat.shape(mat1);
-    let shape2 = Mat.shape(mat2);
-    if (shape1[1] != shape2[0]) return;
+  dot(v1, v2) {
     let result = 0;
-    mat2 = Mat.transpose(mat2);
-    for (let i = 0; i < shape1[1]; i++) {
-      result += mat1[rowIndex][i] * mat2[colIndex][i];
+    for (let i = 0; i < v1.length; i++) {
+      result += v1[i] * v2[i];
     }
     return result;
   },
@@ -331,7 +321,66 @@ const Mat = {
       matrix[i] = row.slice(0);
     }
     return matrix;
-  }
+  },
+  
+  // credit: https://www.geeksforgeeks.org/finding-inverse-of-a-matrix-using-gauss-jordan-method/
+  // Function to perform the inverse operation on the
+  // matrix.
+  inv(mat) {
+      // Matrix Declaration.
+ 
+      let temp;
+      mat = Mat.copy(mat);
+      let order = Mat.shape(mat)[0];
+ 
+      // Create the augmented matrix
+      let identity = Mat.identity(order);
+      
+      for (let i = 0; i < order; i++) {
+        mat[i].push(...identity[i]);
+      }
+ 
+      // Interchange the row of matrix,
+      // interchanging of row will start from the last row
+      for (let i = order - 1; i > 0; i--) {
+ 
+          if (mat[i - 1][0] < mat[i][0]) {
+              let tempArr = mat[i];
+              mat[i] = mat[i - 1];
+              mat[i - 1] = tempArr;
+          }
+      }
+ 
+      // Replace a row by sum of itself and a
+      for (let i = 0; i < order; i++) {
+ 
+          for (let j = 0; j < order; j++) {
+ 
+              if (j != i) {
+ 
+                  temp = mat[j][i] / mat[i][i];
+                  for (let k = 0; k < 2 * order; k++) {
+ 
+                      mat[j][k] -= mat[i][k] * temp;
+                  }
+              }
+          }
+      }
+ 
+        for (let i = 0; i < order; i++) {
+ 
+            temp = mat[i][i];
+            for (let j = 0; j < 2 * order; j++) {
+ 
+                mat[i][j] = mat[i][j] / temp;
+            }
+        }
+        
+        for (let i = 0; i < order; i++) {
+          mat[i].splice(0, 3);
+        }
+        return mat;
+    }
 }
 
 export default Mat;

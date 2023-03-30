@@ -20,14 +20,13 @@ import Mat from './Mat.js';
   function init() {
     canvas.width = 400;
     canvas.height = 400;
-
+    
     for (let i = 0; i < numberOfObjects; i++) {
       objects.push({
         pos: Mat.matrix(Math.random() * canvas.width, Math.random() * canvas.height),
         vel: Mat.matrix((Math.random() - 0.5) * maxSpeed, (Math.random() - 0.5) * maxSpeed)
       })
     }
-
 
     let a, o, g, ot, gt;
     a = Mat.random(6, 6);
@@ -39,6 +38,8 @@ import Mat from './Mat.js';
     div.innerHTML = txt;
     div.style.color = 'white';
     document.body.appendChild(div);
+    
+    let inv;
 
     console.log(measureFunc(() => Mat.copy(a)));
     console.log(measureFunc(() => Mat.matrix(...a)))
@@ -103,6 +104,7 @@ import Mat from './Mat.js';
 
   function reflect(mat, normal) {
     let c = Mat.copy(normal);
-    return Mat.subtract(mat, Mat.multS(c, 2 * Mat.dot(Mat.transpose(mat), c)));
+    return Mat.subtract(mat, Mat.multS(c, 2 * Mat.dot(Mat.transpose(mat)[0], Mat.transpose(c)[0])));
   }
+  
 })();
