@@ -284,6 +284,15 @@ const Mat = {
     }
     return matrix;
   },
+  randomRange(m, n, min = 0, max = 1) {
+    let matrix = Mat.empty(m, n);
+    for (let i = 0; i < m; i++) {
+      for (let j = 0; j < n; j++) {
+        matrix[i][j] = Math.random() * (max - min) + min;
+      }
+    }
+    return matrix;
+  },
   /**
    * Creates a string representation of the matrix with shape information.
    * @param {number[][]} mat 

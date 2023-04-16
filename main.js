@@ -4,29 +4,24 @@ import Mat from './Mat.js';
   const canvas = document.querySelector('canvas');
   const ctx = canvas.getContext('2d');
   const numberOfObjects = 1000;
-  const objects = [];
   const normals = {
-    top: Mat.matrix(0, -1),
-    bottom: Mat.matrix(0, 1),
-    left: Mat.matrix(1, 0),
-    right: Mat.matrix(-1, 0)
+    top: Mat.matrix([0, -1]),
+    bottom: Mat.matrix([0, 1]),
+    left: Mat.matrix([1, 0]),
+    right: Mat.matrix([-1, 0])
   }
-  const maxSpeed = 100;
+  const maxSpeed = 20;
   var last = performance.now();
   var dt = 0;
-
+  
+  const pos = Mat.randomRange(numberOfObjects, 2, 0, 400);
+  const vel = Mat.randomRange(numberOfObjects, 2, -maxSpeed, maxSpeed);
+  
   init();
 
   function init() {
     canvas.width = 400;
     canvas.height = 400;
-    
-    for (let i = 0; i < numberOfObjects; i++) {
-      objects.push({
-        pos: Mat.matrix(Math.random() * canvas.width, Math.random() * canvas.height),
-        vel: Mat.matrix((Math.random() - 0.5) * maxSpeed, (Math.random() - 0.5) * maxSpeed)
-      })
-    }
 
     let a, o, g, ot, gt;
     a = Mat.random(6, 6);
@@ -38,11 +33,9 @@ import Mat from './Mat.js';
     div.innerHTML = txt;
     div.style.color = 'white';
     document.body.appendChild(div);
-    
-    let inv;
 
-    console.log(measureFunc(() => Mat.copy(a)));
-    console.log(measureFunc(() => Mat.matrix(...a)))
+    console.log(measureFunc(() => Mat.copy(a)), 'ms');
+    console.log(measureFunc(() => Mat.matrix(...a)), 'ms');
 
     update();
   }
@@ -54,38 +47,16 @@ import Mat from './Mat.js';
   }
 
   function update() {
-    // updates position
-    for (let i = 0; i < numberOfObjects; i++) {
-      let p = objects[i].pos;
-      let v = objects[i].vel;
-
-      if (p[0][0] < 0) {
-        reflect(v, normals.left);
-        p[0][0] = 1;
-      } else if (p[0][0] > canvas.width) {
-        reflect(v, normals.right);
-        p[0][0] = canvas.width - 1;
-      } else if (p[1][0] < 0) {
-        reflect(v, normals.bottom);
-        p[1][0] = 1;
-      } else if (p[1][0] > canvas.height) {
-        reflect(v, normals.top);
-        p[1][0] = canvas.height - 1;
-      }
-
-      Mat.add(p, Mat.multS(Mat.copy(v), dt));
-    }
-
     // draw background
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // draw objects
-    ctx.strokeStyle = 'blue';
+    ctx.strokeStyle = 'white';
     ctx.beginPath();
     for (let i = 0; i < numberOfObjects; i++) {
-      let x = objects[i].pos[0][0];
-      let y = objects[i].pos[1][0];
+      let x = pos[i][0];
+      let y = pos[i][1];
 
       ctx.moveTo(x - 5, y - 5);
       ctx.lineTo(x + 5, y - 5);
@@ -94,6 +65,23 @@ import Mat from './Mat.js';
       ctx.lineTo(x - 5, y - 5);
     }
     ctx.stroke();
+    
+    // update position
+    Mat.add(pos, Mat.multS(Mat.copy(vel), dt));
+    
+    // reflect
+    for (let i = 0; i < numberOfObjects; i++) {
+      if (pos[i][0] > canvas.width) {
+        reflect([vel[i]], normals.right);
+      } else if (pos[i][0] < 0) {
+        reflect([vel[i]], normals.left);
+      }
+      if (pos[i][1] > canvas.height) {
+        reflect([vel[i]], normals.top);
+      } else if (pos[i][1] < 0) {
+        reflect([vel[i]], normals.bottom);
+      }
+    }
 
     let now = performance.now();
     dt = (now - last) * 0.001;
@@ -104,7 +92,7 @@ import Mat from './Mat.js';
 
   function reflect(mat, normal) {
     let c = Mat.copy(normal);
-    return Mat.subtract(mat, Mat.multS(c, 2 * Mat.dot(Mat.transpose(mat)[0], Mat.transpose(c)[0])));
+    return Mat.subtract(mat, Mat.multS(c, 2 * Mat.dot(mat[0], c[0])));
   }
   
 })();
