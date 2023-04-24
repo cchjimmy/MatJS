@@ -108,9 +108,9 @@ const Mat = {
   transpose(mat) {
     let shape = Mat.shape(mat);
     let result = Mat.empty(shape[1], shape[0]);
-    for (let i = 0; i < shape[0]; i++) {
-      for (let j = 0; j < shape[1]; j++) {
-        result[j][i] = mat[i][j];
+    for (let i = 0; i < shape[1]; i++) {
+      for (let j = 0; j < shape[0]; j++) {
+        result[i][j] = mat[j][i];
       }
     }
     return result;
