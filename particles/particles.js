@@ -1,4 +1,4 @@
-import Mat from './Mat.js';
+import Mat from '../Mat.js';
 
 (function () {
   const canvas = document.createElement('canvas');
@@ -14,8 +14,8 @@ import Mat from './Mat.js';
   var last = performance.now();
   var dt = 0;
   
-  var pos = Mat.randomRange(numberOfObjects, 2, 0, 400);
-  var vel = Mat.randomRange(numberOfObjects, 2, -maxSpeed, maxSpeed);
+  var pos = Mat.random(numberOfObjects, 2, 0, 400);
+  var vel = Mat.random(numberOfObjects, 2, -maxSpeed, maxSpeed);
   
   init();
 
@@ -76,5 +76,4 @@ import Mat from './Mat.js';
     let c = Mat.copy(normal);
     return Mat.subtract(mat, Mat.multS(c, 2 * Mat.dot(mat[0], c[0])));
   }
-  
 })();

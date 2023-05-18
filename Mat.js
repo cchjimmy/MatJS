@@ -2,7 +2,7 @@ const Mat = {
   /**
    * Finds the shape of a matrix.
    * @param {number[][]} mat 
-   * @returns {...number} [number of rows, number of columns]
+   * @returns {number[]} [number of rows, number of columns]
    */
   shape(mat) {
     let rows = mat.length;
@@ -31,7 +31,7 @@ const Mat = {
     // input values into matrix
     for (let i = 0; i < shape[0]; i++) {
       for (let j = 0; j < shape[1]; j++) {
-        matrix[i][j] = values[i][j] || 0;
+        matrix[i][j] = (values[i][j] ?? 0);
       }
     }
 
@@ -41,13 +41,14 @@ const Mat = {
    * Creates a matrix with every entry equals to the specified value.
    * @param {number} m Number of rows.
    * @param {number} n Number of columns.
+   * @param {number} value Specific value to fill the matrix.
    * @returns {number[][]} A matrix with specified shape and value.
    */
   fill(m, n, value) {
     let matrix = new Array(m);
     let row = new Array(n).fill(value);
     for (let i = 0; i < m; i++) {
-      matrix[i] = Array.from(row);
+      matrix[i] = row.slice();
     }
     return matrix;
   },
@@ -58,10 +59,9 @@ const Mat = {
    * @returns {number[][] | undefined} mat1
    */
   add(mat1, mat2) {
-    let shape1 = Mat.shape(mat1);
     let result = Mat.copy(mat1);
-    for (let i = 0; i < shape1[0]; i++) {
-      for (let j = 0; j < shape1[1]; j++) {
+    for (let i = 0; i < result.length; i++) {
+      for (let j = 0; j < result[i].length; j++) {
         result[i][j] += mat2[i][j];
       }
     }
@@ -74,10 +74,9 @@ const Mat = {
    * @returns {number[][] | undefined} mat1
    */
   subtract(mat1, mat2) {
-    let shape1 = Mat.shape(mat1);
     let result = Mat.copy(mat1);
-    for (let i = 0; i < shape1[0]; i++) {
-      for (let j = 0; j < shape1[1]; j++) {
+    for (let i = 0; i < result.length; i++) {
+      for (let j = 0; j < result[i].length; j++) {
         result[i][j] -= mat2[i][j];
       }
     }
@@ -90,10 +89,9 @@ const Mat = {
    * @returns {number[][]} mat
    */
   multS(mat, scalar) {
-    let shape = Mat.shape(mat);
     let result = Mat.copy(mat);
-    for (let i = 0; i < shape[0]; i++) {
-      for (let j = 0; j < shape[1]; j++) {
+    for (let i = 0; i < result.length; i++) {
+      for (let j = 0; j < result[i].length; j++) {
         result[i][j] *= scalar;
       }
     }
@@ -122,7 +120,7 @@ const Mat = {
   copy(source) {
     let matrix = new Array(source.length);
     for (let i = 0; i < source.length; i++) {
-      matrix[i] = Array.from(source[i]);
+      matrix[i] = source[i].slice();
     }
     return matrix;
   },
@@ -269,21 +267,14 @@ const Mat = {
     return swapCount ? [c, s] : c;
   },
   /**
-   * Creates a matrix with all entries being in between 0 and 1.
+   * Creates a matrix with all entries being in between min and max.
    * @param {number} m Number of Rows.
    * @param {number} n Number of columns.
+   * @param {number} min Random minimum.
+   * @param {number} max Random maximum.
    * @returns {number[][]} The random matrix.
    */
-  random(m, n) {
-    let matrix = Mat.empty(m, n);
-    for (let i = 0; i < m; i++) {
-      for (let j = 0; j < n; j++) {
-        matrix[i][j] = Math.random();
-      }
-    }
-    return matrix;
-  },
-  randomRange(m, n, min = 0, max = 1) {
+  random(m, n, min = 0, max = 1) {
     let matrix = Mat.empty(m, n);
     for (let i = 0; i < m; i++) {
       for (let j = 0; j < n; j++) {
@@ -321,72 +312,73 @@ const Mat = {
    * @param {number} n Number of columns.
    * @return {any[][]} The empty matrix.
    */
-  empty(m,n) {
+  empty(m, n) {
     let matrix = new Array(m);
+    let row = new Array(n);
     for (let i = 0; i < m; i++) {
-      matrix[i] = new Array(n);
+      matrix[i] = row.slice();
     }
     return matrix;
   },
-  
+
   // credit: https://www.geeksforgeeks.org/finding-inverse-of-a-matrix-using-gauss-jordan-method/
   // Function to perform the inverse operation on the
   // matrix.
   inv(mat) {
-      // Matrix Declaration.
- 
-      let temp;
-      mat = Mat.copy(mat);
-      let order = Mat.shape(mat)[0];
- 
-      // Create the augmented matrix
-      let identity = Mat.identity(order);
-      
-      for (let i = 0; i < order; i++) {
-        mat[i].push(...identity[i]);
-      }
- 
-      // Interchange the row of matrix,
-      // interchanging of row will start from the last row
-      for (let i = order - 1; i > 0; i--) {
- 
-          if (mat[i - 1][0] < mat[i][0]) {
-              let tempArr = mat[i];
-              mat[i] = mat[i - 1];
-              mat[i - 1] = tempArr;
-          }
-      }
- 
-      // Replace a row by sum of itself and a
-      for (let i = 0; i < order; i++) {
- 
-          for (let j = 0; j < order; j++) {
- 
-              if (j != i) {
- 
-                  temp = mat[j][i] / mat[i][i];
-                  for (let k = 0; k < 2 * order; k++) {
- 
-                      mat[j][k] -= mat[i][k] * temp;
-                  }
-              }
-          }
-      }
- 
-        for (let i = 0; i < order; i++) {
- 
-            temp = mat[i][i];
-            for (let j = 0; j < 2 * order; j++) {
- 
-                mat[i][j] = mat[i][j] / temp;
-            }
-        }
-        
-        for (let i = 0; i < order; i++) {
-          mat[i].splice(0, 3);
-        }
-        return mat;
+    // Matrix Declaration.
+
+    let temp;
+    mat = Mat.copy(mat);
+    let order = Mat.shape(mat)[0];
+
+    // Create the augmented matrix
+    let identity = Mat.identity(order);
+
+    for (let i = 0; i < order; i++) {
+      mat[i].push(...identity[i]);
     }
+
+    // Interchange the row of matrix,
+    // interchanging of row will start from the last row
+    for (let i = order - 1; i > 0; i--) {
+
+      if (mat[i - 1][0] < mat[i][0]) {
+        let tempArr = mat[i];
+        mat[i] = mat[i - 1];
+        mat[i - 1] = tempArr;
+      }
+    }
+
+    // Replace a row by sum of itself and a
+    for (let i = 0; i < order; i++) {
+
+      for (let j = 0; j < order; j++) {
+
+        if (j != i) {
+
+          temp = mat[j][i] / mat[i][i];
+          for (let k = 0; k < 2 * order; k++) {
+
+            mat[j][k] -= mat[i][k] * temp;
+          }
+        }
+      }
+    }
+
+    for (let i = 0; i < order; i++) {
+
+      temp = mat[i][i];
+      for (let j = 0; j < 2 * order; j++) {
+
+        mat[i][j] = mat[i][j] / temp;
+      }
+    }
+
+    for (let i = 0; i < order; i++) {
+      mat[i].splice(0, 3);
+    }
+    return mat;
+  }
 }
 
 export default Mat;

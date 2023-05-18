@@ -9,7 +9,6 @@ import Mat from "../Mat.js";
   canvas.width = innerWidth;
   canvas.height = innerHeight;
   
-  ctx.fillStyle = "black";
   ctx.strokeStyle = "white";
   
   let angle = 100;
@@ -70,13 +69,13 @@ import Mat from "../Mat.js";
   let r = 0;
   update();
   function update() {
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     for (let i = 0; i < objects.length; i++) {
       let model = models[objects[i].modelIndex];
-      objects[i].rotation[0] = r;
+      objects[i].rotation[0] = 0;
       objects[i].rotation[1] = r;
-      objects[i].rotation[2] = r;
+      objects[i].rotation[2] = 0;
       let rotationMatrix = generateRotationMatrix(...objects[i].rotation);
       let v_transformed = transform(model.vertices, clipMatrix, rotationMatrix, objects[i].position, camera, canvas.width, canvas.height);
       wireFrame(v_transformed, model.faces, ctx);
@@ -138,17 +137,12 @@ import Mat from "../Mat.js";
   }
   
   function transform(vertices, clipMatrix, rotationMatrix, position, origin, width, height) {
-    let result = Mat.copy(vertices);
-    
-    result = Mat.multM(result, rotationMatrix);
+    let result = Mat.multM(vertices, rotationMatrix);
     
     for (let i = 0; i < result.length; i++) {
-      for (let j = 0; j < position.length; j++) {
-        result[i][j] += position[j];
-      }
-      for (let j = 0; j < origin.length; j++) {
-        result[i][j] -= origin[j];
-      }
+      result[i][0] += position[0] - origin[0];
+      result[i][1] += position[1] - origin[1];
+      result[i][2] += position[2] - origin[2];
     }
     
     result = Mat.multM(result, clipMatrix);
@@ -157,6 +151,7 @@ import Mat from "../Mat.js";
       result[i][0] = result[i][0] * width / (2 * result[i][3]) + width * 0.5;
       result[i][1] = result[i][1] * height / (2 * result[i][3]) + height * 0.5;
     }
+
     return result;
   }
   
