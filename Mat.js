@@ -44,14 +44,10 @@ const Mat = {
    * @returns {number[][]} A matrix with specified shape and value.
    */
   fill(m, n, value) {
-    // credit: https://stackoverflow.com/questions/34773846/javascript-faster-way-to-create-and-initialize-two-dimensional-array-matrix
     let matrix = new Array(m);
-    let row = new Array(n);
-    for (let i = 0; i < n; i++) {
-      row[i] = value;
-    }
+    let row = new Array(n).fill(value);
     for (let i = 0; i < m; i++) {
-      matrix[i] = row.slice(0);
+      matrix[i] = Array.from(row);
     }
     return matrix;
   },
@@ -63,12 +59,13 @@ const Mat = {
    */
   add(mat1, mat2) {
     let shape1 = Mat.shape(mat1);
+    let result = Mat.copy(mat1);
     for (let i = 0; i < shape1[0]; i++) {
       for (let j = 0; j < shape1[1]; j++) {
-        mat1[i][j] += mat2[i][j];
+        result[i][j] += mat2[i][j];
       }
     }
-    return mat1;
+    return result;
   },
   /**
    * Matrix subtration, modifies the matrix in the first argument. Both input matrices must have the same shape.
@@ -78,12 +75,13 @@ const Mat = {
    */
   subtract(mat1, mat2) {
     let shape1 = Mat.shape(mat1);
+    let result = Mat.copy(mat1);
     for (let i = 0; i < shape1[0]; i++) {
       for (let j = 0; j < shape1[1]; j++) {
-        mat1[i][j] -= mat2[i][j];
+        result[i][j] -= mat2[i][j];
       }
     }
-    return mat1;
+    return result;
   },
   /**
    * Multiplies the input scalar into all entries of the input matrix.
@@ -93,12 +91,13 @@ const Mat = {
    */
   multS(mat, scalar) {
     let shape = Mat.shape(mat);
+    let result = Mat.copy(mat);
     for (let i = 0; i < shape[0]; i++) {
       for (let j = 0; j < shape[1]; j++) {
-        mat[i][j] *= scalar;
+        result[i][j] *= scalar;
       }
     }
-    return mat;
+    return result;
   },
   /**
    * Matrix transposition, this does not modify the input matrix.
@@ -123,7 +122,7 @@ const Mat = {
   copy(source) {
     let matrix = new Array(source.length);
     for (let i = 0; i < source.length; i++) {
-      matrix[i] = source[i].slice(0);
+      matrix[i] = Array.from(source[i]);
     }
     return matrix;
   },
@@ -324,9 +323,8 @@ const Mat = {
    */
   empty(m,n) {
     let matrix = new Array(m);
-    let row = new Array(n);
     for (let i = 0; i < m; i++) {
-      matrix[i] = row.slice(0);
+      matrix[i] = new Array(n);
     }
     return matrix;
   },

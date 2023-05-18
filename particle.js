@@ -1,7 +1,7 @@
 import Mat from './Mat.js';
 
 (function () {
-  const canvas = document.querySelector('canvas');
+  const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   const numberOfObjects = 1000;
   const normals = {
@@ -14,14 +14,16 @@ import Mat from './Mat.js';
   var last = performance.now();
   var dt = 0;
   
-  const pos = Mat.randomRange(numberOfObjects, 2, 0, 400);
-  const vel = Mat.randomRange(numberOfObjects, 2, -maxSpeed, maxSpeed);
+  var pos = Mat.randomRange(numberOfObjects, 2, 0, 400);
+  var vel = Mat.randomRange(numberOfObjects, 2, -maxSpeed, maxSpeed);
   
   init();
 
   function init() {
     canvas.width = 400;
     canvas.height = 400;
+    
+    document.body.appendChild(canvas);
 
     update();
   }
@@ -47,19 +49,19 @@ import Mat from './Mat.js';
     ctx.stroke();
     
     // update position
-    Mat.add(pos, Mat.multS(Mat.copy(vel), dt));
+    pos = Mat.add(pos, Mat.multS(Mat.copy(vel), dt));
     
     // reflect
     for (let i = 0; i < numberOfObjects; i++) {
       if (pos[i][0] > canvas.width) {
-        reflect([vel[i]], normals.right);
+        vel[i] = reflect([vel[i]], normals.right)[0];
       } else if (pos[i][0] < 0) {
-        reflect([vel[i]], normals.left);
+        vel[i] = reflect([vel[i]], normals.left)[0];
       }
       if (pos[i][1] > canvas.height) {
-        reflect([vel[i]], normals.top);
+        vel[i] = reflect([vel[i]], normals.top)[0];
       } else if (pos[i][1] < 0) {
-        reflect([vel[i]], normals.bottom);
+        vel[i] = reflect([vel[i]], normals.bottom)[0];
       }
     }
 
