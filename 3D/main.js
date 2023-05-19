@@ -32,7 +32,7 @@ import Mat from "../Mat.js";
     objects.push(
       {
         modelIndex: i % models.length,
-        position: [_x, _y, 0],
+        position: [_x, _y, 0, 1],
         rotation: [0, 0, 0]
       })
     _x += 3;
@@ -137,21 +137,19 @@ import Mat from "../Mat.js";
   }
   
   function transform(vertices, clipMatrix, rotationMatrix, position, origin, width, height) {
-    let result = Mat.multM(vertices, rotationMatrix);
-    
-    for (let i = 0; i < result.length; i++) {
-      result[i][0] += position[0] - origin[0];
-      result[i][1] += position[1] - origin[1];
-      result[i][2] += position[2] - origin[2];
+    let result = new Array(vertices.length);
+    for (let i = 0; i < vertices.length; i++) {
+      let vertex = [vertices[i]];
+      vertex = Mat.multM(vertex, rotationMatrix);
+      vertex = Mat.add(vertex, [position]);
+      vertex = Mat.subtract(vertex, [origin]);
+      vertex = Mat.multM(vertex, clipMatrix);
+      vertex = vertex[0];
+      vertex[0] = vertex[0] * width / (2 * vertex[3]) + width * 0.5;
+      vertex[1] = vertex[1] * height / (2* vertex[3]) + height * 0.5;
+      result[i] = vertex;
     }
     
-    result = Mat.multM(result, clipMatrix);
-    
-    for (let i = 0; i < result.length; i++) {
-      result[i][0] = result[i][0] * width / (2 * result[i][3]) + width * 0.5;
-      result[i][1] = result[i][1] * height / (2 * result[i][3]) + height * 0.5;
-    }
-
     return result;
   }
   
