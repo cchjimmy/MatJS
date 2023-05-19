@@ -26,12 +26,12 @@ const Mat = {
     let shape = Mat.shape(values);
 
     // initialize matrix
-    let matrix = Mat.empty(shape[0], shape[1]);
+    let matrix = Mat.fill(shape[0], shape[1]);
 
     // input values into matrix
     for (let i = 0; i < shape[0]; i++) {
       for (let j = 0; j < shape[1]; j++) {
-        matrix[i][j] = (values[i][j] ?? 0);
+        matrix[i][j] += values[i][j];
       }
     }
 
@@ -44,7 +44,7 @@ const Mat = {
    * @param {number} value Specific value to fill the matrix.
    * @returns {number[][]} A matrix with specified shape and value.
    */
-  fill(m, n, value) {
+  fill(m, n, value = 0) {
     let matrix = new Array(m);
     let row = new Array(n).fill(value);
     for (let i = 0; i < m; i++) {
@@ -104,10 +104,10 @@ const Mat = {
    */
   transpose(mat) {
     let shape = Mat.shape(mat);
-    let result = Mat.empty(shape[1], shape[0]);
+    let result = Mat.fill(shape[1], shape[0]);
     for (let i = 0; i < shape[1]; i++) {
       for (let j = 0; j < shape[0]; j++) {
-        result[i][j] = mat[j][i];
+        result[i][j] += mat[j][i];
       }
     }
     return result;
@@ -133,11 +133,11 @@ const Mat = {
   multM(mat1, mat2) {
     let shape1 = Mat.shape(mat1);
     let shape2 = Mat.shape(mat2);
-    let result = Mat.empty(shape1[0], shape2[1]);
+    let result = Mat.fill(shape1[0], shape2[1]);
     mat2 = Mat.transpose(mat2);
     for (let i = 0; i < shape1[0]; i++) {
       for (let j = 0; j < shape2[1]; j++) {
-        result[i][j] = Mat.dot(mat1[i], mat2[j]);
+        result[i][j] += Mat.dot(mat1[i], mat2[j]);
       }
     }
     return result;
@@ -161,9 +161,9 @@ const Mat = {
    * @returns {number[][]} An identity matrix.
    */
   identity(order) {
-    let matrix = Mat.fill(order, order, 0);
+    let matrix = Mat.fill(order, order);
     for (let i = 0; i < order; i++) {
-      matrix[i][i] = 1;
+      matrix[i][i] += 1;
     }
     return matrix;
   },
@@ -275,10 +275,10 @@ const Mat = {
    * @returns {number[][]} The random matrix.
    */
   random(m, n, min = 0, max = 1) {
-    let matrix = Mat.empty(m, n);
+    let matrix = Mat.fill(m, n);
     for (let i = 0; i < m; i++) {
       for (let j = 0; j < n; j++) {
-        matrix[i][j] = Math.random() * (max - min) + min;
+        matrix[i][j] += Math.random() * (max - min) + min;
       }
     }
     return matrix;
@@ -305,20 +305,6 @@ const Mat = {
       s += ` -------`;
     }
     return s;
-  },
-  /**
-   * Creates a new empty matrix with shape m * n.
-   * @param {number} m Number of rows.
-   * @param {number} n Number of columns.
-   * @return {any[][]} The empty matrix.
-   */
-  empty(m, n) {
-    let matrix = new Array(m);
-    let row = new Array(n);
-    for (let i = 0; i < m; i++) {
-      matrix[i] = row.slice();
-    }
-    return matrix;
   },
 
   // credit: https://www.geeksforgeeks.org/finding-inverse-of-a-matrix-using-gauss-jordan-method/
