@@ -13,31 +13,6 @@ const Mat = {
     return [rows, columns];
   },
   /**
-   * Creates a matrix, a 2d array of numbers.
-   * @param  {...number} values 
-   * @returns {number[][]} A new matrix.
-   */
-  matrix(...values) {
-    // make input values into the form, which has an array as a base container with other arrays contained within, which acts as the rows of a matrix
-    for (let i = 0; i < values.length; i++) {
-      values[i] = values[i].length ? values[i] : [values[i]];
-    }
-
-    let shape = Mat.shape(values);
-
-    // initialize matrix
-    let matrix = Mat.fill(shape[0], shape[1]);
-
-    // input values into matrix
-    for (let i = 0; i < shape[0]; i++) {
-      for (let j = 0; j < shape[1]; j++) {
-        matrix[i][j] += values[i][j];
-      }
-    }
-
-    return matrix;
-  },
-  /**
    * Creates a matrix with every entry equals to the specified value.
    * @param {number} m Number of rows.
    * @param {number} n Number of columns.
@@ -59,10 +34,12 @@ const Mat = {
    * @returns {number[][] | undefined} mat1
    */
   add(mat1, mat2) {
-    let result = Mat.copy(mat1);
-    for (let i = 0; i < result.length; i++) {
-      for (let j = 0; j < result[i].length; j++) {
-        result[i][j] += mat2[i][j];
+    let [r, c] = Mat.shape(mat1);
+    let result = new Array(r);
+    for (let i = 0; i < r; i++) {
+      result[i] = new Array(c);
+      for (let j = 0; j < c; j++) {
+        result[i][j] = mat1[i][j] + mat2[i][j];
       }
     }
     return result;
@@ -74,10 +51,12 @@ const Mat = {
    * @returns {number[][] | undefined} mat1
    */
   subtract(mat1, mat2) {
-    let result = Mat.copy(mat1);
-    for (let i = 0; i < result.length; i++) {
-      for (let j = 0; j < result[i].length; j++) {
-        result[i][j] -= mat2[i][j];
+    let [r, c] = Mat.shape(mat1);
+    let result = new Array(r);
+    for (let i = 0; i < r; i++) {
+      result[i] = new Array(c);
+      for (let j = 0; j < c; j++) {
+        result[i][j] = mat1[i][j] - mat2[i][j];
       }
     }
     return result;
@@ -89,10 +68,12 @@ const Mat = {
    * @returns {number[][]} mat
    */
   multS(mat, scalar) {
-    let result = Mat.copy(mat);
-    for (let i = 0; i < result.length; i++) {
-      for (let j = 0; j < result[i].length; j++) {
-        result[i][j] *= scalar;
+    let [r, c] = Mat.shape(mat);
+    let result = new Array(r);
+    for (let i = 0; i < r; i++) {
+      result[i] = new Array(c);
+      for (let j = 0; j < c; j++) {
+        result[i][j] = mat[i][j] * scalar;
       }
     }
     return result;
@@ -103,11 +84,12 @@ const Mat = {
    * @returns {number[][]} A new matrix of the transposed input matrix.
    */
   transpose(mat) {
-    let shape = Mat.shape(mat);
-    let result = Mat.fill(shape[1], shape[0]);
-    for (let i = 0; i < shape[1]; i++) {
-      for (let j = 0; j < shape[0]; j++) {
-        result[i][j] += mat[j][i];
+    let [r, c] = Mat.shape(mat);
+    let result = new Array(c);
+    for (let i = 0; i < c; i++) {
+      result[i] = new Array(r);
+      for (let j = 0; j < r; j++) {
+        result[i][j] = mat[j][i];
       }
     }
     return result;
@@ -133,17 +115,20 @@ const Mat = {
   multM(mat1, mat2) {
     let shape1 = Mat.shape(mat1);
     let shape2 = Mat.shape(mat2);
-    let result = Mat.fill(shape1[0], shape2[1]);
-    mat2 = Mat.transpose(mat2);
+    let result = new Array(shape1[0]);
     for (let i = 0; i < shape1[0]; i++) {
+      result[i] = new Array(shape2[1]);
       for (let j = 0; j < shape2[1]; j++) {
-        result[i][j] += Mat.dot(mat1[i], mat2[j]);
+        result[i][j] = 0;
+        for (let k = 0; k < shape1[1]; k++) {
+          result[i][j] += mat1[i][k] * mat2[k][j];
+        }
       }
     }
     return result;
   },
   /**
-   * dot product between 2 nth length vectors, v1 and v2
+   * dot product between 2 nth length vectors v1 and v2
    * @param {number[]} v1
    * @param {number[]} v2
    * @returns {number} The result of the dot product.
@@ -275,10 +260,11 @@ const Mat = {
    * @returns {number[][]} The random matrix.
    */
   random(m, n, min = 0, max = 1) {
-    let matrix = Mat.fill(m, n);
+    let matrix = new Array(m);
     for (let i = 0; i < m; i++) {
+      matrix[i] = new Array(n);
       for (let j = 0; j < n; j++) {
-        matrix[i][j] += Math.random() * (max - min) + min;
+        matrix[i][j] = Math.random() * (max - min) + min;
       }
     }
     return matrix;

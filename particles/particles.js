@@ -5,10 +5,10 @@ import Mat from '../Mat.js';
   const ctx = canvas.getContext('2d');
   const numberOfObjects = 1000;
   const normals = {
-    top: Mat.matrix([0, -1]),
-    bottom: Mat.matrix([0, 1]),
-    left: Mat.matrix([1, 0]),
-    right: Mat.matrix([-1, 0])
+    top: [0, -1],
+    bottom: [0, 1],
+    left: [1, 0],
+    right: [-1, 0]
   }
   const maxSpeed = 20;
   var last = performance.now();
@@ -49,7 +49,7 @@ import Mat from '../Mat.js';
     ctx.stroke();
     
     // update position
-    pos = Mat.add(pos, Mat.multS(Mat.copy(vel), dt));
+    pos = Mat.add(pos, Mat.multS(vel, dt));
     
     // reflect
     for (let i = 0; i < numberOfObjects; i++) {
@@ -73,7 +73,7 @@ import Mat from '../Mat.js';
   }
 
   function reflect(mat, normal) {
-    let c = Mat.copy(normal);
+    let c = Mat.copy([normal]);
     return Mat.subtract(mat, Mat.multS(c, 2 * Mat.dot(mat[0], c[0])));
   }
 })();
