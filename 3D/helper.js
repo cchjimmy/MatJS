@@ -27,7 +27,7 @@ export function processObj(obj) {
     } else if (line[0] == "f") {
       let face = line.slice(1);
       for (let i = 0; i < face.length; i++) {
-        face[i] = parseInt(face[i]);
+        face[i] = parseInt(face[i]) - 1;
         if (isNaN(face[i])) face.splice(i, 1);
       }
       faces.push(face);
