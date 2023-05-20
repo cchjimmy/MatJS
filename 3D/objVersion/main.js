@@ -1,4 +1,5 @@
-import Mat from "../Mat.js";
+import Mat from "../../Mat.js";
+import { readObjFiles } from "../helper.js";
 
 // credit: https://stackoverflow.com/questions/724219/how-to-convert-a-3d-point-into-2d-perspective-projection
 
@@ -17,9 +18,9 @@ import Mat from "../Mat.js";
   let clipMatrix = generateClipMatrix(fov, aspectRatio, 1, 100);
   let models = [];
   let modelPaths = [
-    "./models/spoon.obj",
-    "./models/teacup.obj",
-    "./models/teapot.obj"
+    "../models/spoon.obj",
+    "../models/teacup.obj",
+    "../models/teapot.obj"
   ]
 
   let objects = [];
@@ -86,56 +87,6 @@ import Mat from "../Mat.js";
     requestAnimationFrame(update);
   }
 
-  function readObjFiles(paths, container = []) {
-    for (let i = 0; i < paths.length; i++) {
-      let req = new XMLHttpRequest;
-      req.onload = (e) => {
-        container.push(processObj(req.response));
-      }
-      req.open("GET", paths[i], false);
-      req.send();
-    }
-    return container;
-  }
-
-  function processObj(obj) {
-    let vertices = [];
-    let faces = [];
-    obj = obj.split("\n");
-    let name = obj[0].split(" ")[1].split(".")[0];
-    for (let i = 0; i < obj.length; i++) {
-      let line = obj[i].split(" ");
-      if (line[0] == "v") {
-        let vertex = line.slice(1);
-        for (let i = 0; i < vertex.length; i++) {
-          vertex[i] = parseFloat(vertex[i]);
-        }
-        vertex[3] = 1;
-        vertices.push(vertex);
-      } else if (line[0] == "f") {
-        let face = line.slice(1);
-        for (let i = 0; i < face.length; i++) {
-          face[i] = parseInt(face[i]);
-          if (isNaN(face[i])) face.splice(i, 1);
-        }
-        faces.push(face);
-      }
-    }
-    return { name, vertices, faces };
-  }
-
-  function wireFrame(vertices, faces, ctx) {
-    ctx.beginPath();
-    for (let i = 0; i < faces.length; i++) {
-      ctx.moveTo(ctx.canvas.width - vertices[faces[i][0]][0], vertices[faces[i][0]][1]);
-      for (let j = 1; j < faces[i].length; j++) {
-        if (!vertices[faces[i][j]]) continue;
-        ctx.lineTo(ctx.canvas.width - vertices[faces[i][j]][0], vertices[faces[i][j]][1]);
-      }
-    }
-    ctx.stroke();
-  }
-
   function transform(vertices, clipMatrix, rotationMatrix, position, origin, width, height) {
     let result = Mat.multM(vertices, rotationMatrix);
 
@@ -164,7 +115,7 @@ import Mat from "../Mat.js";
     clipMatrix[3][2] = (2 * near * far) / (near - far);
     return clipMatrix;
   }
-
+  
   function generateRotationMatrix(rx = 0, ry = 0, rz = 0) {
     let cx = Math.cos(rx);
     let cy = Math.cos(ry);
@@ -172,12 +123,24 @@ import Mat from "../Mat.js";
     let sx = Math.sin(rx);
     let sy = Math.sin(ry);
     let sz = Math.sin(rz);
-
+  
     return [
       [cx * cy, cx * sy * sz - sx * cz, cx * sy * cz + sx * sz, 0],
       [sx * cy, sx * sy * sz + cx * cz, sx * sy * cz - cx * sz, 0],
       [-sy, cy * sz, cy * cz, 0],
       [0, 0, 0, 1]
     ]
+  }
+
+  function wireFrame(vertices, faces, ctx) {
+    ctx.beginPath();
+    for (let i = 0; i < faces.length; i++) {
+      ctx.moveTo(ctx.canvas.width - vertices[faces[i][0]][0], vertices[faces[i][0]][1]);
+      for (let j = 1; j < faces[i].length; j++) {
+        if (!vertices[faces[i][j]]) continue;
+        ctx.lineTo(ctx.canvas.width - vertices[faces[i][j]][0], vertices[faces[i][j]][1]);
+      }
+    }
+    ctx.stroke();
   }
 })();

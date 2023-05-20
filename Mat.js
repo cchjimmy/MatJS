@@ -274,7 +274,7 @@ const Mat = {
    * @param {number[][]} mat 
    * @returns {string} The string representing the input matrix.
    */
-  string(mat) {
+  pretty(mat) {
     let shape = Mat.shape(mat);
     let s = `rows: ${shape[0]}, columns: ${shape[1]}\n`;
     for (let i = 0; i < shape[0]; i++) {
