@@ -88,13 +88,13 @@ import { readObjFiles } from "../helper.js";
 
     r += 0.01;
 
-    // requestAnimationFrame(update);
+    requestAnimationFrame(update);
   }
 
   function transform(vertices, clipMatrix, rotationMatrix, position, origin, width, height) {
     let result = vertices.multM(rotationMatrix);
-
-    for (let i = 0; i < result.length; i++) {
+    let [r, c] = result.shape();
+    for (let i = 0; i < r; i++) {
       result.set(i, 0, result.get(i, 0) + position[0] - origin[0]);
       result.set(i, 1, result.get(i, 1) + position[1] - origin[1]);
       result.set(i, 2, result.get(i, 2) + position[2] - origin[2]);
@@ -102,7 +102,7 @@ import { readObjFiles } from "../helper.js";
 
     result = result.multM(clipMatrix);
 
-    for (let i = 0; i < result.length; i++) {
+    for (let i = 0; i < r; i++) {
       result.set(i, 0, result.get(i, 0) * width / (2 * result.get(i, 3)) + width * 0.5);
       result.set(i, 1, result.get(i, 1) * height / (2 * result.get(i, 3)) + height * 0.5);
     }

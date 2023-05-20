@@ -16,8 +16,6 @@ let c = Mat.define([
   [6, 5, 4]
 ])
 
-a.set(0, 1, a.get(1, 0))
-
 console.log(a.add(c))
 
 console.log(a.subtract(c))

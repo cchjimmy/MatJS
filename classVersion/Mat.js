@@ -28,6 +28,7 @@ export default class Mat {
   }
   set(r = 0, c = 0, value) {
     this.#values[c + r * this.#columns] = value;
+    return this;
   }
   getColumn(c) {
     let result = new Array(this.#rows);

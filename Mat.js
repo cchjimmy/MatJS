@@ -166,7 +166,7 @@ const Mat = {
     let r1 = r0.slice(1);
     r1.push((r0.length - 1) % 2 ? 1 : -1);
     for (let i = 0; i < order; i++) {
-      matrix[i] = i % 2 ? r1 : r0;
+      matrix[i] = i % 2 ? r1.slice() : r0.slice();
     }
     return matrix;
   },
