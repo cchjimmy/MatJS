@@ -139,9 +139,11 @@ import { readObjFiles } from "../helper.js";
   function wireFrame(vertices, faces, ctx) {
     ctx.beginPath();
     for (let i = 0; i < faces.length; i++) {
-      ctx.moveTo(ctx.canvas.width - vertices.get(faces[i][0], 0), vertices.get(faces[i][0], 1));
+      let face = vertices.getRow(faces[i][0]);
+      ctx.moveTo(ctx.canvas.width - face[0], face[1]);
       for (let j = 1; j < faces[i].length; j++) {
-        ctx.lineTo(ctx.canvas.width - vertices.get(faces[i][j], 0), vertices.get(faces[i][j], 1));
+        face = vertices.getRow(faces[i][j]);
+        ctx.lineTo(ctx.canvas.width - face[0], face[1]);
       }
     }
     ctx.stroke();
