@@ -12,7 +12,7 @@ import { readObjFiles } from "../helper.js";
 
   ctx.strokeStyle = "white";
 
-  let angle = 100;
+  let angle = 60 * Math.PI / 180;
   let fov = 1 / Math.tan(angle / 2);
   let aspectRatio = canvas.width / canvas.height;
   let clipMatrix = generateClipMatrix(fov, aspectRatio, 1, 100);
@@ -38,13 +38,14 @@ import { readObjFiles } from "../helper.js";
       {
         modelIndex: i % models.length,
         position: [_x, _y, 0, 1],
-        rotation: [0, 0, 0]
+        rotation: [0, 0, 0],
+        scale: [1, 1, 1]
       })
     _x += 3;
     _y += 3;
   }
 
-  let camera = [0, 0, -30, 1];
+  let camera = [0, 2, -10, 1];
 
   const keys = new Map();
 
@@ -81,8 +82,9 @@ import { readObjFiles } from "../helper.js";
       objects[i].rotation[0] = 0;
       objects[i].rotation[1] = r;
       objects[i].rotation[2] = 0;
+      let scaleMatrix = generateScaleMatrix(...objects[i].scale);
       let rotationMatrix = generateRotationMatrix(...objects[i].rotation);
-      let v_transformed = transform(model.vertices, clipMatrix, rotationMatrix, objects[i].position, camera, canvas.width, canvas.height);
+      let v_transformed = transform(model.vertices, clipMatrix, scaleMatrix, rotationMatrix, objects[i].position, camera, canvas.width, canvas.height);
       wireFrame(v_transformed, model.faces, ctx);
     }
 
@@ -91,8 +93,9 @@ import { readObjFiles } from "../helper.js";
     requestAnimationFrame(update);
   }
 
-  function transform(vertices, clipMatrix, rotationMatrix, position, origin, width, height) {
-    let result = vertices.multM(rotationMatrix);
+  function transform(vertices, clipMatrix, scaleMatrix, rotationMatrix, position, origin, width, height) {
+    let result = vertices.multM(scaleMatrix);
+    result = result.multM(rotationMatrix);
     let [r, c] = result.shape();
     for (let i = 0; i < r; i++) {
       result.set(i, 0, result.get(i, 0) + position[0] - origin[0]);
@@ -102,9 +105,11 @@ import { readObjFiles } from "../helper.js";
 
     result = result.multM(clipMatrix);
 
+    // transform from homogeneous 4d vector into 2d
     for (let i = 0; i < r; i++) {
       result.set(i, 0, result.get(i, 0) * width / (2 * result.get(i, 3)) + width * 0.5);
-      result.set(i, 1, result.get(i, 1) * height / (2 * result.get(i, 3)) + height * 0.5);
+      // invert height because y is downward positive
+      result.set(i, 1, height - (result.get(i, 1) * height / (2 * result.get(i, 3)) + height * 0.5));
     }
 
     return result;
@@ -118,6 +123,14 @@ import { readObjFiles } from "../helper.js";
     clipMatrix.set(2, 3, 1);
     clipMatrix.set(3, 2, (2 * near * far) / (near - far));
     return clipMatrix;
+  }
+  
+  function generateScaleMatrix(sx, sy, sz) {
+    let matrix = Mat.identity(4);
+    matrix.set(0, 0, sx);
+    matrix.set(1, 1, sy);
+    matrix.set(2, 2, sz);
+    return matrix;
   }
   
   function generateRotationMatrix(rx = 0, ry = 0, rz = 0) {
@@ -139,12 +152,13 @@ import { readObjFiles } from "../helper.js";
   function wireFrame(vertices, faces, ctx) {
     ctx.beginPath();
     for (let i = 0; i < faces.length; i++) {
-      let face = vertices.getRow(faces[i][0]);
-      ctx.moveTo(ctx.canvas.width - face[0], face[1]);
+      let v = vertices.getRow(faces[i][0]);
+      ctx.moveTo(v[0], v[1]);
       for (let j = 1; j < faces[i].length; j++) {
-        face = vertices.getRow(faces[i][j]);
-        ctx.lineTo(ctx.canvas.width - face[0], face[1]);
+        let v = vertices.getRow(faces[i][j]);
+        ctx.lineTo(v[0], v[1]);
       }
+      ctx.lineTo(v[0], v[1]);
     }
     ctx.stroke();
   }

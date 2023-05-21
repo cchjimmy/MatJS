@@ -12,7 +12,7 @@ import { readObjFiles } from "../helper.js";
 
   ctx.strokeStyle = "white";
 
-  let angle = 100;
+  let angle = 60 * Math.PI / 180;
   let fov = 1 / Math.tan(angle / 2);
   let aspectRatio = canvas.width / canvas.height;
   let clipMatrix = generateClipMatrix(fov, aspectRatio, 1, 100);
@@ -40,7 +40,7 @@ import { readObjFiles } from "../helper.js";
     _y += 3;
   }
 
-  let camera = [0, 0, -30, 1];
+  let camera = [0, 2, -5, 1];
 
   const keys = new Map();
 
@@ -100,7 +100,7 @@ import { readObjFiles } from "../helper.js";
 
     for (let i = 0; i < result.length; i++) {
       result[i][0] = result[i][0] * width / (2 * result[i][3]) + width * 0.5;
-      result[i][1] = result[i][1] * height / (2 * result[i][3]) + height * 0.5;
+      result[i][1] = height - (result[i][1] * height / (2 * result[i][3]) + height * 0.5);
     }
 
     return result;
@@ -135,11 +135,12 @@ import { readObjFiles } from "../helper.js";
   function wireFrame(vertices, faces, ctx) {
     ctx.beginPath();
     for (let i = 0; i < faces.length; i++) {
-      ctx.moveTo(ctx.canvas.width - vertices[faces[i][0]][0], vertices[faces[i][0]][1]);
+      ctx.moveTo(vertices[faces[i][0]][0], vertices[faces[i][0]][1]);
       for (let j = 1; j < faces[i].length; j++) {
         if (!vertices[faces[i][j]]) continue;
-        ctx.lineTo(ctx.canvas.width - vertices[faces[i][j]][0], vertices[faces[i][j]][1]);
+        ctx.lineTo(vertices[faces[i][j]][0], vertices[faces[i][j]][1]);
       }
+      ctx.lineTo(vertices[faces[i][0]][0], vertices[faces[i][0]][1]);
     }
     ctx.stroke();
   }
