@@ -12,14 +12,13 @@ import { readObjFiles } from "../helper.js";
 
   ctx.strokeStyle = "white";
 
-  let angle = 60 * Math.PI / 180;
-  let fov = 1 / Math.tan(angle / 2);
+  let fov = 60 * Math.PI / 180;
   let aspectRatio = canvas.width / canvas.height;
-  let clipMatrix = generateClipMatrix(fov, aspectRatio, 1, 100);
+  let clipMatrix = generatePerspectiveMatrix(fov, aspectRatio, 1, 100);
   let models = [];
   let modelPaths = [
-    "../models/spoon.obj",
-    "../models/teacup.obj",
+    // "../models/spoon.obj",
+    // "../models/teacup.obj",
     "../models/teapot.obj"
   ]
 
@@ -94,8 +93,8 @@ import { readObjFiles } from "../helper.js";
   }
 
   function transform(vertices, clipMatrix, scaleMatrix, rotationMatrix, position, origin, width, height) {
-    let result = vertices.multM(scaleMatrix);
-    result = result.multM(rotationMatrix);
+    let result = vertices.multM(scaleMatrix.multM(rotationMatrix));
+    
     let [r, c] = result.shape();
     for (let i = 0; i < r; i++) {
       result.set(i, 0, result.get(i, 0) + position[0] - origin[0]);
@@ -115,10 +114,10 @@ import { readObjFiles } from "../helper.js";
     return result;
   }
 
-  function generateClipMatrix(fov, aspectRatio, near, far) {
+  function generatePerspectiveMatrix(fov, aspectRatio, near, far) {
     let clipMatrix = Mat.fill(4, 4);
-    clipMatrix.set(0, 0, fov / aspectRatio);
-    clipMatrix.set(1, 1, fov);
+    clipMatrix.set(1, 1, 1 / Math.tan(fov / 2));
+    clipMatrix.set(0, 0, clipMatrix.get(1, 1) / aspectRatio);
     clipMatrix.set(2, 2, (far + near) / (far - near));
     clipMatrix.set(2, 3, 1);
     clipMatrix.set(3, 2, (2 * near * far) / (near - far));

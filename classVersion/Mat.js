@@ -57,17 +57,18 @@ export default class Mat {
     return new Mat(this.#rows, this.#columns, result);
   }
   multM(mat) {
-    let shape = mat.shape();
-    let result = new Array(this.#rows * shape[1]);
+    let [r, c] = mat.shape();
+    mat = mat.array();
+    let result = new Array(this.#rows * c);
     for (let i = 0; i < this.#rows; i++) {
-      for (let j = 0; j < shape[1]; j++) {
-        result[j + i * shape[1]] = 0;
-        for (let k = 0; k < shape[0]; k++) {
-          result[j + i * shape[1]] += this.#values[k + i * this.#columns] * mat.get(k, j);
+      for (let j = 0; j < c; j++) {
+        result[j + i * c] = 0;
+        for (let k = 0; k < r; k++) {
+          result[j + i * c] += this.#values[k + i * this.#columns] * mat[j + k * c];
         }
       }
     }
-    return new Mat(this.#rows, shape[1], result);
+    return new Mat(this.#rows, c, result);
   }
   multS(s) {
     let result = this.values();
