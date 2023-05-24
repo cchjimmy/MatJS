@@ -23,10 +23,10 @@ export default class Mat {
   array() {
     return this.#values.slice();
   }
-  get(r = 0, c = 0) {
+  get(r, c) {
     return this.#values[c + r * this.#columns];
   }
-  set(r = 0, c = 0, value) {
+  set(r, c, value) {
     this.#values[c + r * this.#columns] = value;
     return this;
   }
@@ -44,7 +44,7 @@ export default class Mat {
     let result = this.array();
     mat = mat.array();
     for (let i = 0; i < result.length; i++) {
-      result[i] += mat[i]
+      result[i] += mat[i];
     }
     return new Mat(this.#rows, this.#columns, result);
   }
@@ -52,7 +52,7 @@ export default class Mat {
     let result = this.array();
     mat = mat.array();
     for (let i = 0; i < result.length; i++) {
-      result[i] -= mat[i]
+      result[i] -= mat[i];
     }
     return new Mat(this.#rows, this.#columns, result);
   }
@@ -84,6 +84,7 @@ export default class Mat {
     }
     return new Mat(this.#columns, this.#rows, result);
   }
+  
   static fill(m, n, value = 0) {
     let result = new Array(m * n).fill(value);
     return new Mat(m, n, result);

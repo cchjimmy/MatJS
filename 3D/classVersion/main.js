@@ -30,18 +30,14 @@ import { readObjFiles } from "../helper.js";
     models[i].vertices = Mat.define(models[i].vertices);
   }
 
-  let _x = -6;
-  let _y = -6;
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 1; i++) {
     objects.push(
       {
         modelIndex: i % models.length,
-        position: [_x, _y, 0, 1],
+        position: [0, 0, 0, 1],
         rotation: [0, 0, 0],
         scale: [1, 1, 1]
       })
-    _x += 3;
-    _y += 3;
   }
 
   let camera = [0, 2, -10, 1];
@@ -52,18 +48,19 @@ import { readObjFiles } from "../helper.js";
     keys.set(e.code, true);
   }
 
+  let speed = 0.5;
   window.onkeydown = () => {
     if (keys.get("KeyW")) {
-      camera[2] += 0.5;
+      camera[2] += speed;
     }
     if (keys.get("KeyS")) {
-      camera[2] -= 0.5;
+      camera[2] -= speed;
     }
     if (keys.get("KeyA")) {
-      camera[0] -= 0.5;
+      camera[0] -= speed;
     }
     if (keys.get("KeyD")) {
-      camera[0] += 0.5;
+      camera[0] += speed;
     }
   }
 

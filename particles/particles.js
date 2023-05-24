@@ -1,4 +1,4 @@
-import Mat from '../Mat.js';
+import Mat from '../objectVersion/Mat.js';
 
 (function () {
   const canvas = document.createElement('canvas');

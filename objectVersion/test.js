@@ -1,8 +1,8 @@
-import Mat from './Mat.js';
-import { measureFunc } from "./helper.js";
+import Mat from "./Mat.js";
+import { measureFunc } from "../helper.js";
 
 (function () {
-  let z = Mat.matrix([5, 7, 9], [4, 3, 8], [7, 5, 6]);
+  let z = [[5, 7, 9], [4, 3, 8], [7, 5, 6]];
   console.log(Mat.pretty(z), Mat.pretty(Mat.inv(z)));
 
   let a = [[1, 2, 3], [4, 5, 6]];
@@ -22,5 +22,4 @@ import { measureFunc } from "./helper.js";
   document.body.appendChild(div);
 
   console.log(measureFunc(() => Mat.copy(a)), 'ms');
-  console.log(measureFunc(() => Mat.matrix(...a)), 'ms');
 })()
