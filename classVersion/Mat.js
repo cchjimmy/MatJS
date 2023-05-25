@@ -62,9 +62,10 @@ export default class Mat {
     let result = new Array(this.#rows * c);
     for (let i = 0; i < this.#rows; i++) {
       for (let j = 0; j < c; j++) {
-        result[j + i * c] = 0;
+        let index = j + i * c;
+        result[index] = 0;
         for (let k = 0; k < r; k++) {
-          result[j + i * c] += this.#values[k + i * this.#columns] * mat[j + k * c];
+          result[index] += this.#values[k + i * this.#columns] * mat[j + k * c];
         }
       }
     }
@@ -80,7 +81,7 @@ export default class Mat {
   transpose() {
     let result = new Array(this.#values.length);
     for (let i = 0; i < this.#values.length; i++) {
-      result[parseInt(i / this.#columns) + i % this.#columns * this.#columns] = this.#values[i]; 
+      result[parseInt(i / this.#columns) + i % this.#columns * this.#rows] = this.#values[i]; 
     }
     return new Mat(this.#columns, this.#rows, result);
   }

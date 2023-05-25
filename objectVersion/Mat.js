@@ -157,7 +157,7 @@ const Mat = {
    * @param {number} order 
    * @returns {number[][]} A sign matrix
    */
-  signs(order) {
+  sign(order) {
     let matrix = new Array(order);
     let r0 = new Array(order);
     for (let i = 0; i < order; i++) {

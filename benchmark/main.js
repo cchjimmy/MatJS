@@ -1,26 +1,50 @@
 import MatC from "../classVersion/Mat.js";
 import MatO from "../objectVersion/Mat.js";
-import { measureFunc } from "../helper.js";
+import { bench } from "../helper.js";
 
-console.log("100 x 100 multiplication, 1000 repetitions");
+let a, b;
+
+console.log("100 x 100 matrix multiplication");
 console.log("object version:");
-let a = MatO.fill(100, 100, 1);
-let b = MatO.fill(100, 100, 2);
+a = MatO.identity(100);
+b = MatO.fill(100, 100, 1);
 
-console.log(bench(()=>MatO.multM(a, b), 1000) + " ms");
-
+console.log(bench(()=>MatO.multM(a, b), [10, 100, 1000]));
 console.log("class version:");
 
-a = MatC.fill(100, 100, 1);
-b = MatC.fill(100, 100, 2);
+a = MatC.identity(100);
+b = MatC.fill(100, 100, 1);
 
-console.log(bench(()=>a.multM(b), 1000) + " ms");
+console.log(bench(()=>a.multM(b), [10, 100, 1000]));
 
-function bench(func, repeat) {
-  let average = 0;
-  for (let i = 0; i < repeat; i++) {
-    average += measureFunc(func);
-  }
-  average /= repeat;
-  return average;
-}
+console.log("100 x 100 matrix addition");
+console.log("object version:");
+a = MatO.random(100, 100);
+b = MatO.fill(100, 100, 1);
+
+console.log(bench(() => MatO.add(a, b), [10, 100, 1000]));
+console.log("class version:");
+
+a = MatC.random(100, 100);
+b = MatC.fill(100, 100, 1);
+
+console.log(bench(() => a.add(b), [10, 100, 1000]));
+
+console.log("100 x 100 matrix fill");
+console.log("object version:");
+
+console.log(bench(() => MatO.fill(100, 100), [10, 100, 1000]));
+console.log("class version:");
+
+console.log(bench(() => MatC.fill(100, 100), [10, 100, 1000]));
+
+console.log("100 x 100 matrix transpose");
+console.log("object version:");
+
+a = MatO.random(100, 100);
+
+console.log(bench(() => MatO.transpose(a), [10, 100, 1000]));
+console.log("class version:");
+
+a = MatC.random(100, 100);
+console.log(bench(() => a.transpose(), [10, 100, 1000]));
