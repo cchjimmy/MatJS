@@ -1,5 +1,5 @@
 import Mat from "../../objectVersion/Mat.js";
-import { readObjFiles } from "../helper.js";
+import { readObjFiles, wireFrame } from "../helper.js";
 
 // credit: https://stackoverflow.com/questions/724219/how-to-convert-a-3d-point-into-2d-perspective-projection
 
@@ -86,17 +86,16 @@ import { readObjFiles } from "../helper.js";
   }
 
   function transform(vertices, clipMatrix, rotationMatrix, scaleMatrix, position, origin, width, height) {
-    let result = Mat.multM(vertices, Mat.multM(scaleMatrix, rotationMatrix));
+    let result = new Array(vertices.length);
 
-    for (let i = 0; i < result.length; i++) {
+    let M = Mat.multM(scaleMatrix, rotationMatrix);
+
+    for (let i = 0; i < vertices.length; i++) {
+      result[i] = Mat.multM([vertices[i]], M)[0];
       result[i][0] += position[0] - origin[0];
       result[i][1] += position[1] - origin[1];
       result[i][2] += position[2] - origin[2];
-    }
-
-    result = Mat.multM(result, clipMatrix);
-
-    for (let i = 0; i < result.length; i++) {
+      result[i] = Mat.multM([result[i]], clipMatrix)[0];
       result[i][0] = result[i][0] * width / (2 * result[i][3]) + width * 0.5;
       result[i][1] = height - (result[i][1] * height / (2 * result[i][3]) + height * 0.5);
     }
@@ -136,18 +135,5 @@ import { readObjFiles } from "../helper.js";
     i[1][1] = sy;
     i[2][2] = sz;
     return i;
-  }
-
-  function wireFrame(vertices, faces, ctx) {
-    ctx.beginPath();
-    for (let i = 0; i < faces.length; i++) {
-      ctx.moveTo(vertices[faces[i][0]][0], vertices[faces[i][0]][1]);
-      for (let j = 1; j < faces[i].length; j++) {
-        if (!vertices[faces[i][j]]) continue;
-        ctx.lineTo(vertices[faces[i][j]][0], vertices[faces[i][j]][1]);
-      }
-      ctx.lineTo(vertices[faces[i][0]][0], vertices[faces[i][0]][1]);
-    }
-    ctx.stroke();
   }
 })();

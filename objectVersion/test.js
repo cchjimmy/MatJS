@@ -1,5 +1,5 @@
 import Mat from "./Mat.js";
-import { measureFunc } from "../helper.js";
+import { measureFunc } from "../benchmark/helper.js";
 
 (function () {
   let z = [[5, 7, 9], [4, 3, 8], [7, 5, 6]];
@@ -18,8 +18,18 @@ import { measureFunc } from "../helper.js";
 
   let div = document.createElement('div');
   div.innerHTML = txt;
-  div.style.color = 'white';
   document.body.appendChild(div);
 
   console.log(measureFunc(() => Mat.copy(a)), 'ms');
+
+  a = [
+    [1, 2, 3],
+    [4, 5, 6]
+  ];
+  b = [
+    [3, 4, 5],
+    [6, 7, 8]
+  ]
+  console.log(Mat.pretty(Mat.add(a, b)))
+  console.log(Mat.pretty(Mat.subtract(a, b)))
 })()

@@ -1,5 +1,5 @@
 import Mat from "../../classVersion/Mat.js";
-import { readObjFiles } from "../helper.js";
+import { readObjFiles, wireFrame } from "../helper.js";
 
 // credit: https://stackoverflow.com/questions/724219/how-to-convert-a-3d-point-into-2d-perspective-projection
 
@@ -25,10 +25,6 @@ import { readObjFiles } from "../helper.js";
   let objects = [];
 
   readObjFiles(modelPaths, models);
-
-  for (let i = 0; i < models.length; i++) {
-    models[i].vertices = Mat.define(models[i].vertices);
-  }
 
   for (let i = 0; i < 1; i++) {
     objects.push(
@@ -90,22 +86,20 @@ import { readObjFiles } from "../helper.js";
   }
 
   function transform(vertices, clipMatrix, scaleMatrix, rotationMatrix, position, origin, width, height) {
-    let result = vertices.multM(scaleMatrix.multM(rotationMatrix));
+    let M = scaleMatrix.multM(rotationMatrix);
     
-    let [r, c] = result.shape();
-    for (let i = 0; i < r; i++) {
-      result.set(i, 0, result.get(i, 0) + position[0] - origin[0]);
-      result.set(i, 1, result.get(i, 1) + position[1] - origin[1]);
-      result.set(i, 2, result.get(i, 2) + position[2] - origin[2]);
-    }
+    let result = new Array(vertices.length);
 
-    result = result.multM(clipMatrix);
-
-    // transform from homogeneous 4d vector into 2d
-    for (let i = 0; i < r; i++) {
-      result.set(i, 0, result.get(i, 0) * width / (2 * result.get(i, 3)) + width * 0.5);
-      // invert height because y is downward positive
-      result.set(i, 1, height - (result.get(i, 1) * height / (2 * result.get(i, 3)) + height * 0.5));
+    for (let i = 0; i < vertices.length; i++) {
+      result[i] = new Mat(1, 4, vertices[i]);
+      result[i] = result[i].multM(M);
+      result[i].set(0, 0, result[i].get(0, 0) + position[0] - origin[0]);
+      result[i].set(0, 1, result[i].get(0, 1) + position[1] - origin[1]);
+      result[i].set(0, 2, result[i].get(0, 2) + position[2] - origin[2]);
+      result[i] = result[i].multM(clipMatrix);
+      result[i].set(0, 0, result[i].get(0, 0) * width / (2 * result[i].get(0, 3)) + width * 0.5);
+      result[i].set(0, 1, height - (result[i].get(0, 1) * height / (2 * result[i].get(0, 3)) + height * 0.5));
+      result[i] = result[i].array();
     }
 
     return result;
@@ -143,19 +137,5 @@ import { readObjFiles } from "../helper.js";
       [-sy, cy * sz, cy * cz, 0],
       [0, 0, 0, 1]
     ])
-  }
-
-  function wireFrame(vertices, faces, ctx) {
-    ctx.beginPath();
-    for (let i = 0; i < faces.length; i++) {
-      let v = vertices.getRow(faces[i][0]);
-      ctx.moveTo(v[0], v[1]);
-      for (let j = 1; j < faces[i].length; j++) {
-        let v = vertices.getRow(faces[i][j]);
-        ctx.lineTo(v[0], v[1]);
-      }
-      ctx.lineTo(v[0], v[1]);
-    }
-    ctx.stroke();
   }
 })();

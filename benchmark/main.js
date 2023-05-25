@@ -1,6 +1,6 @@
 import MatC from "../classVersion/Mat.js";
 import MatO from "../objectVersion/Mat.js";
-import { bench } from "../helper.js";
+import { bench } from "./helper.js";
 
 let a, b;
 
@@ -9,13 +9,13 @@ console.log("object version:");
 a = MatO.identity(100);
 b = MatO.fill(100, 100, 1);
 
-console.log(bench(()=>MatO.multM(a, b), [10, 100, 1000]));
+console.log(bench(() => MatO.multM(a, b), [10, 100, 1000]));
 console.log("class version:");
 
 a = MatC.identity(100);
 b = MatC.fill(100, 100, 1);
 
-console.log(bench(()=>a.multM(b), [10, 100, 1000]));
+console.log(bench(() => a.multM(b), [10, 100, 1000]));
 
 console.log("100 x 100 matrix addition");
 console.log("object version:");

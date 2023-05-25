@@ -35,3 +35,16 @@ export function processObj(obj) {
   }
   return { name, vertices, faces };
 }
+
+export function wireFrame(vertices, faces, ctx) {
+  ctx.beginPath();
+  for (let i = 0; i < faces.length; i++) {
+    ctx.moveTo(vertices[faces[i][0]][0], vertices[faces[i][0]][1]);
+    for (let j = 1; j < faces[i].length; j++) {
+      if (!vertices[faces[i][j]]) continue;
+      ctx.lineTo(vertices[faces[i][j]][0], vertices[faces[i][j]][1]);
+    }
+    ctx.lineTo(vertices[faces[i][0]][0], vertices[faces[i][0]][1]);
+  }
+  ctx.stroke();
+}
