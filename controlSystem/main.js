@@ -20,9 +20,11 @@ function main() {
   let D = [
     [0]
     ];
+  let initialPosition = 200;
+  let initialSpeed = 0;
   let states = [
-    [200], // initial position
-    [0] // initial speed
+    [initialPosition],
+    [initialSpeed]
     ]
   let input = [
     [0] // control signal input
@@ -55,6 +57,18 @@ function main() {
     // equilibrium line
     ctx.moveTo(canvas.width * 0.5, canvas.height * 0.5 + radius);
     ctx.lineTo(canvas.width * 0.5, canvas.height * 0.5 - radius * 2);
+    
+    // spring
+    let coils = 5;
+    let coilRadius = 20;
+    let springLength = canvas.width * 0.5 + states[0][0] - radius;
+    let coilInterval = springLength / coils / 2;
+    ctx.moveTo(0, canvas.height * 0.5 + coilRadius);
+    for (let i = 0; i < coils * 2; i++) {
+      let sign = i % 2 ? 1 : -1;
+      ctx.lineTo(coilInterval * i, canvas.height * 0.5 + sign * coilRadius);
+    }
+    ctx.lineTo(springLength, canvas.height * 0.5);
     
     // ball
     ctx.moveTo(output[0][0] + canvas.width * 0.5, canvas.height * 0.5);
