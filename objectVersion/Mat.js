@@ -350,6 +350,24 @@ const Mat = {
       mat[i].splice(0, 3);
     }
     return mat;
+  },
+  max(mat) {
+    let max = -Infinity;
+    for (let i = 0; i < mat.length; i++) {
+      for (let j = 0; j < mat[i].length; j++) {
+        max = max >= mat[i][j] ? max : mat[i][j];
+      }
+    }
+    return max;
+  },
+  min(mat) {
+    let min = Infinity;
+    for (let i = 0; i < mat.length; i++) {
+      for (let j = 0; j < mat[i].length; j++) {
+        min = min <= mat[i][j] ? min : mat[i][j];
+      }
+    }
+    return min;
   }
 }
 

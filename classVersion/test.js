@@ -25,3 +25,5 @@ console.log(a.multM(b));
 console.log(Mat.random(2, 3));
 
 console.log(a.transpose());
+
+console.log(a.max(), a.min());

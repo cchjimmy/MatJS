@@ -30,6 +30,8 @@ import { measureFunc } from "../benchmark/helper.js";
     [3, 4, 5],
     [6, 7, 8]
   ]
-  console.log(Mat.pretty(Mat.add(a, b)))
-  console.log(Mat.pretty(Mat.subtract(a, b)))
+  console.log(Mat.pretty(Mat.add(a, b)));
+  console.log(Mat.pretty(Mat.subtract(a, b)));
+  console.log(Mat.max(a));
+  console.log(Mat.min(b));
 })()

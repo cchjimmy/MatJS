@@ -73,7 +73,6 @@ import Mat from '../objectVersion/Mat.js';
   }
 
   function reflect(mat, normal) {
-    let c = Mat.copy([normal]);
-    return Mat.subtract(mat, Mat.multS(c, 2 * Mat.dot(mat[0], c[0])));
+    return Mat.subtract(mat, Mat.multS([normal], 2 * Mat.dot(mat[0], normal)));
   }
 })();

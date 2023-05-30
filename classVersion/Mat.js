@@ -85,7 +85,20 @@ export default class Mat {
     }
     return new Mat(this.#columns, this.#rows, result);
   }
-  
+  max() {
+    let max = -Infinity;
+    for (let i = 0; i < this.#values.length; i++) {
+      max = max >= this.#values[i] ? max : this.#values[i];
+    }
+    return max;
+  }
+  min() {
+    let min = Infinity;
+    for (let i = 0; i < this.#values.length; i++) {
+      min = min <= this.#values[i] ? min : this.#values[i];
+    }
+    return min;
+  }
   static fill(m, n, value = 0) {
     let result = new Array(m * n).fill(value);
     return new Mat(m, n, result);
