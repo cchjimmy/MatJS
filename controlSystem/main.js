@@ -20,7 +20,7 @@ function main() {
   let D = [
     [0]
     ];
-  let initialPosition = 200;
+  let initialPosition = -200;
   let initialSpeed = 0;
   let states = [
     [initialPosition],
@@ -44,12 +44,14 @@ function main() {
   animate();
   
   function animate() {
-    let [change, output] = update(A, B, C, D, states, input);
-    let radius = 70;
-    
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     ctx.beginPath();
+    let radius = 70;
+    // ball
+    ctx.moveTo(states[0][0] + canvas.width * 0.5 + radius, canvas.height * 0.5);
+    ctx.arc(states[0][0] + canvas.width * 0.5, canvas.height * 0.5, radius, 0, Math.PI * 2);
+        
     // floor
     ctx.moveTo(0, canvas.height * 0.5 + radius);
     ctx.lineTo(canvas.width, canvas.height * 0.5 + radius);
@@ -69,11 +71,9 @@ function main() {
       ctx.lineTo(coilInterval * i, canvas.height * 0.5 + sign * coilRadius);
     }
     ctx.lineTo(springLength, canvas.height * 0.5);
-    
-    // ball
-    ctx.moveTo(output[0][0] + canvas.width * 0.5, canvas.height * 0.5);
-    ctx.arc(output[0][0] + canvas.width * 0.5, canvas.height * 0.5, radius, 0, Math.PI*2);
     ctx.stroke();
+    
+    let [change, output] = update(A, B, C, D, states, input);
     
     // update states
     states = Mat.add(states, Mat.multS(change, dt / 1000));
